@@ -1,0 +1,55 @@
+import Link from "next/link";
+import { FooterLayout } from "./FooterLayout";
+import { FOOTER_KEY, validateFooter } from "@/lib/footer-builder-server";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { getSettings } from "@/lib/settings";
+import { SiteBrand } from "./SiteBrand";
+import { db } from "@/db";
+import { footerLinks, settings } from "@/db/schema";
+import { asc, eq } from "drizzle-orm";
+import { FooterScripts } from "./FooterScripts";
+import { SiteMenuHtml } from "./SiteMenuHtml";
+import { getSiteMenu } from "@/lib/site-menus";
+import type { SiteMenuItem } from "@/lib/site-menus";
+import { siteBrandText } from "@/lib/brand";
+
+function FooterItem({ item, nested = false, siteName }: { item: SiteMenuItem; nested?: boolean; siteName: string }) {
+  const linkClass = nested ? "text-xs text-slate-400 hover:text-white" : "text-sm text-slate-300 hover:text-white";
+  const label = siteBrandText(item.label, siteName);
+  const content = item.customHtml ? <SiteMenuHtml html={item.customHtml} label={label} className={linkClass} /> : item.href ? (/^https:\/\//i.test(item.href)
+    ? <a href={item.href} target={item.targetBlank ? "_blank" : undefined} rel={item.targetBlank ? "noopener noreferrer" : undefined} className={linkClass}>{label}</a>
+    : <Link href={item.href} target={item.targetBlank ? "_blank" : undefined} rel={item.targetBlank ? "noopener noreferrer" : undefined} className={linkClass}>{label}</Link>) : <span className="font-medium text-slate-200">{label}</span>;
+  return <li>{content}{item.children.length > 0 && <ul className="mt-1 space-y-1 border-r border-slate-700 pr-3">{item.children.map((child) => <FooterItem key={child.id} item={child} nested siteName={siteName}/>)}</ul>}</li>;
+}
+
+export async function SiteFooter() {
+  const s = await getSettings();
+  const [saved] = await db.select().from(settings).where(eq(settings.key, FOOTER_KEY));
+  if (saved) {
+    const config = validateFooter((saved.value as { config: unknown }).config);
+    if (config.enabled) return <div className="mt-12"><FooterLayout config={config} brand={{ siteName: s.siteName, siteTagline: s.siteTagline, siteLogoMediaId: Number(s.siteLogoMediaId), supportPhone: s.supportPhone, supportEmail: s.supportEmail, supportHours: s.supportHours, senderAddress: s.senderAddress }}/><PolicyLinks/><FooterScripts code={s.footerScripts}/></div>;
+  }
+  let menuItems: SiteMenuItem[] = [];
+  let legacyFallback = false;
+  try { const menu = await getSiteMenu("footer"); menuItems = menu?.items ?? []; if (menu?.enabled === false) legacyFallback = false; }
+  catch { legacyFallback = true; /* During a rolling migration, keep serving the legacy footer links. */ }
+  const legacy = legacyFallback ? await db.select().from(footerLinks).where(eq(footerLinks.enabled, true)).orderBy(asc(footerLinks.sortOrder), asc(footerLinks.id)).catch(() => []) : [];
+  const links: SiteMenuItem[] = menuItems.length ? menuItems : legacy.map((item) => ({ ...item, menuId: 0, parentId: null, customHtml: null, groupTitle: item.groupTitle, targetBlank: false, legacyFooterLinkId: null, deletedAt: null, children: [] }));
+  const displayLinks = links;
+  const groups = Array.from(new Set(displayLinks.map((item) => siteBrandText(item.groupTitle || "دسترسی سریع", s.siteName))));
+  return (
+    <footer id="site-footer" className="boutique-footer mt-12 bg-slate-900 text-slate-300">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-2"><div className="flex items-center gap-2 text-white"><SiteBrand name={s.siteName} logoMediaId={Number(s.siteLogoMediaId)} boxClassName="h-8 w-8" iconClassName="h-4 w-4"/><b className="text-lg">{s.siteName}</b></div><p className="text-sm leading-7">{s.siteTagline}. فروشگاه آنلاین لباس ترک در نمین؛ مجموعه‌ای از مانتو، شومیز، بلوز، تاپ و تیشرت زنانه.</p></div>
+        {groups.map((group) => <div key={group}><b className="mb-3 block text-white">{group}</b><ul className="space-y-2">{displayLinks.filter((item) => siteBrandText(item.groupTitle || "دسترسی سریع", s.siteName) === group && !item.parentId).map((item) => <FooterItem key={item.id} item={item} siteName={s.siteName}/>)}</ul></div>)}
+        <div className="space-y-2 text-sm"><b className="mb-3 block text-white">ارتباط با ما</b><div className="flex items-center gap-2"><MapPin className="h-4 w-4" />{s.senderAddress}</div>{s.supportPhone && <div className="flex items-center gap-2"><Phone className="h-4 w-4" /><span dir="ltr">{s.supportPhone}</span></div>}<div className="flex items-center gap-2"><Clock className="h-4 w-4" />{s.supportHours}</div>{s.supportEmail && <div className="flex items-center gap-2"><Mail className="h-4 w-4" />{s.supportEmail}</div>}</div>
+      </div>
+      <PolicyLinks/><div className="border-t border-slate-800 py-4 text-center text-xs">© {s.siteName} — تمامی حقوق محفوظ است.</div>
+      <FooterScripts code={s.footerScripts} />
+    </footer>
+  );
+}
+
+function PolicyLinks() {
+  return <nav aria-label="راهنما و قوانین" className="flex flex-wrap justify-center gap-x-5 gap-y-2 border-t border-slate-800 px-4 py-4 text-xs text-slate-300"><Link href="/shipping-delivery" className="hover:text-amber-300">راهنمای ارسال و تحویل</Link><Link href="/terms-conditions" className="hover:text-amber-300">شرایط استفاده</Link></nav>;
+}
