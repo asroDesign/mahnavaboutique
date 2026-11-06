@@ -15,6 +15,12 @@ import { stripHtml, toSafeHtml } from "@/lib/html";
 
 const PER = 12;
 const SORTS: [string, string][] = [["relevance", "مرتبط‌ترین"], ["best", "پرفروش‌ترین"], ["new", "جدیدترین"], ["price_asc", "ارزان‌ترین"], ["price_desc", "گران‌ترین"], ["discount", "بیشترین تخفیف"]];
+function paginationItems(current: number, total: number): (number | "start-gap" | "end-gap")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 4) return [1, 2, 3, 4, 5, "end-gap", total];
+  if (current >= total - 3) return [1, "start-gap", total - 4, total - 3, total - 2, total - 1, total];
+  return [1, "start-gap", current - 1, current, current + 1, "end-gap", total];
+}
 type RawShopParams = Record<string, string | string[] | undefined>;
 const first = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
 function normalizeShopParams(raw: RawShopParams): ShopFilters {
@@ -61,8 +67,8 @@ export default async function Shop({ searchParams }: { searchParams: Promise<Raw
     listShopProducts(filters), categoriesWithCounts(),
     db.selectDistinct({ b: products.brand }).from(products).where(sql`${products.status} in ('active','out_of_stock')`), vehicleMakes(), getSettings(),
   ]);
-  const page = Math.max(1, Number(sp.page) || 1);
   const pages = Math.max(1, Math.ceil(items.length / PER));
+  const page = Math.min(pages, Math.max(1, Number(sp.page) || 1));
   const shown = items.slice((page - 1) * PER, page * PER);
   const cat = cats.find((c) => String(c.id) === sp.cat);
   const categoryFaqs = (cat?.faqs ?? []) as { question: string; answer: string }[];
@@ -147,10 +153,10 @@ export default async function Shop({ searchParams }: { searchParams: Promise<Raw
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 sm:gap-4">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div>
           )}
           {pages > 1 && (
-            <nav className="mt-8 flex items-center justify-center gap-1">
-              <Link aria-disabled={page <= 1} href={href({ page: String(Math.max(1, page - 1)) })} className="btn-sm"><ChevronRight className="h-4 w-4" /></Link>
-              {Array.from({ length: pages }, (_, i) => i + 1).map((n) => <Link key={n} href={href({ page: String(n) })} className={`grid h-9 min-w-9 place-items-center rounded-lg text-sm ${n === page ? "bg-emerald-600 font-bold text-white" : "border bg-white"}`}>{faNum(n)}</Link>)}
-              <Link href={href({ page: String(Math.min(pages, page + 1)) })} className="btn-sm"><ChevronLeft className="h-4 w-4" /></Link>
+            <nav aria-label="صفحه‌بندی محصولات" className="mt-8 flex w-full max-w-full min-w-0 flex-wrap items-center justify-center gap-1 px-1">
+              <Link aria-label="صفحه قبلی" aria-disabled={page <= 1} href={href({ page: String(Math.max(1, page - 1)) })} className={`btn-sm min-w-9 justify-center px-2 ${page <= 1 ? "pointer-events-none opacity-40" : ""}`}><ChevronRight className="h-4 w-4" /></Link>
+              {paginationItems(page, pages).map((item, index) => typeof item === "number" ? <Link key={item} aria-current={item === page ? "page" : undefined} href={href({ page: String(item) })} className={`grid h-9 min-w-9 place-items-center rounded-lg text-sm ${item === page ? "bg-emerald-600 font-bold text-white" : "border bg-white"}`}>{faNum(item)}</Link> : <span key={`${item}-${index}`} aria-hidden="true" className="grid h-9 min-w-6 place-items-center text-sm text-slate-500">…</span>)}
+              <Link aria-label="صفحه بعدی" aria-disabled={page >= pages} href={href({ page: String(Math.min(pages, page + 1)) })} className={`btn-sm min-w-9 justify-center px-2 ${page >= pages ? "pointer-events-none opacity-40" : ""}`}><ChevronLeft className="h-4 w-4" /></Link>
             </nav>
           )}
           {cat?.description && <section className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="mb-4 text-xl font-black text-emerald-950">راهنمای خرید {cat.name}</h2><div className="prose prose-slate max-w-none leading-8" dangerouslySetInnerHTML={{ __html: toSafeHtml(cat.description) }} /></section>}

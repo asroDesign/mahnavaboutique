@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, ChevronLeft, Menu, X } from "lucide-react";
 import { SiteMenuHtml } from "./SiteMenuHtml";
 export type PublicMenuItem = { id: number; label: string; href: string | null; customHtml?: string | null; targetBlank: boolean; children: PublicMenuItem[] };
@@ -24,14 +25,31 @@ function DesktopSubItem({ item }: { item: PublicMenuItem }) {
 
 export function SiteNavMenus({ headerItems, mobileItems, fallbackItems, mode = "all", showMobile = true }: { headerItems: PublicMenuItem[]; mobileItems: PublicMenuItem[]; fallbackItems: PublicMenuItem[]; mode?: "all" | "mobileOnly" | "desktopOnly"; showMobile?: boolean }) {
   const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
   const mobile = mobileItems.length ? mobileItems : headerItems.length ? headerItems : fallbackItems;
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        trigger.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
   return <>
     {mode !== "mobileOnly" && <div className="hidden items-center md:flex">{headerItems.length ? headerItems.map((item) => <DesktopItem key={item.id} item={item}/>) : fallbackItems.map((item) => <DesktopItem key={item.id} item={item}/>)}</div>}
     {mode !== "desktopOnly" && showMobile && <>
     <div className="relative md:hidden">
-      <button type="button" onClick={() => setOpen((value) => !value)} className="inline-flex items-center gap-1 rounded-xl border border-slate-200 px-2.5 py-2 text-sm text-slate-700" aria-expanded={open} aria-label={open ? "بستن منوی سایت" : "بازکردن منوی سایت"}>{open ? <X className="size-5"/> : <Menu className="size-5"/>}<span>منو</span></button>
-      {open && <div role="navigation" aria-label="منوی موبایل" className="absolute right-0 top-full z-50 mt-2 max-h-[75vh] w-[min(90vw,24rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-2xl">{mobile.map((item) => <MobileItem key={item.id} item={item} close={() => setOpen(false)} depth={0}/>)}</div>}
+      <button ref={trigger} type="button" onClick={() => setOpen((value) => !value)} className="inline-flex items-center gap-1 rounded-xl border border-slate-200 px-2.5 py-2 text-sm text-slate-700" aria-expanded={open} aria-controls="site-mobile-navigation" aria-label={open ? "بستن منوی سایت" : "بازکردن منوی سایت"}>{open ? <X className="size-5"/> : <Menu className="size-5"/>}<span>منو</span></button>
     </div>
+    {open && createPortal(<div className="fixed inset-0 z-[100] bg-slate-950/45 md:hidden" onClick={() => setOpen(false)}>
+      <aside id="site-mobile-navigation" role="dialog" aria-modal="true" aria-label="منوی سایت" onClick={(event) => event.stopPropagation()} className="absolute inset-y-0 right-0 flex h-[100dvh] w-[min(86vw,22rem)] max-w-full flex-col bg-white text-slate-800 shadow-2xl">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-3"><b className="text-base">منوی سایت</b><button type="button" onClick={() => setOpen(false)} className="grid size-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100" aria-label="بستن منوی سایت"><X className="size-5"/></button></div>
+        <nav aria-label="پیوندهای سایت" className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-2">{mobile.map((item) => <MobileItem key={item.id} item={item} close={() => setOpen(false)} depth={0}/>)}</nav>
+      </aside>
+    </div>, document.body)}
     </>}
   </>;
 }

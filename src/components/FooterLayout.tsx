@@ -29,7 +29,10 @@ export function FooterLayout({ config, brand, preview = false, previewDark = fal
           <div className={`flex gap-3 ${c.layout === "row" ? "flex-wrap items-center" : "flex-col"}`} style={{ ...(c.layout === "row" ? { justifyContent: c.align === "center" ? "center" : c.align === "left" ? "flex-end" : "flex-start" } : { alignItems: c.align === "center" ? "center" : c.align === "left" ? "flex-end" : "stretch" }) }}>{c.items.filter(i => i.enabled).map(i => <div key={i.id} className="min-w-0 max-w-full"><FooterContent item={i} brand={brand} preview={preview} previewDark={previewDark}/></div>)}</div>
         </div>)}</div>
       </section>)}
-      {config.copyright && <p className="py-5 text-center text-xs leading-6 opacity-65">{footerText(config.copyright, brand)}</p>}
+      <div className="border-t border-current/10 py-5 text-center text-xs leading-6 opacity-75">
+        {config.copyright && <span>{footerText(config.copyright, brand)}<span className="mx-2" aria-hidden="true">·</span></span>}
+        <span>طراحی توسط <a href="https://asrodev.ir" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-current/40 underline-offset-4 hover:decoration-current">آسرودیزاین</a></span>
+      </div>
     </div>
   </footer>;
 }

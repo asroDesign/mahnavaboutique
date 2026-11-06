@@ -44,7 +44,7 @@ export async function SiteFooter() {
         {groups.map((group) => <div key={group}><b className="mb-3 block text-white">{group}</b><ul className="space-y-2">{displayLinks.filter((item) => siteBrandText(item.groupTitle || "دسترسی سریع", s.siteName) === group && !item.parentId).map((item) => <FooterItem key={item.id} item={item} siteName={s.siteName}/>)}</ul></div>)}
         <div className="space-y-2 text-sm"><b className="mb-3 block text-white">ارتباط با ما</b><div className="flex items-center gap-2"><MapPin className="h-4 w-4" />{s.senderAddress}</div>{s.supportPhone && <div className="flex items-center gap-2"><Phone className="h-4 w-4" /><span dir="ltr">{s.supportPhone}</span></div>}<div className="flex items-center gap-2"><Clock className="h-4 w-4" />{s.supportHours}</div>{s.supportEmail && <div className="flex items-center gap-2"><Mail className="h-4 w-4" />{s.supportEmail}</div>}</div>
       </div>
-      <PolicyLinks/><div className="border-t border-slate-800 py-4 text-center text-xs">© {s.siteName} — تمامی حقوق محفوظ است.</div>
+      <PolicyLinks/><div className="border-t border-slate-800 px-4 py-4 text-center text-xs leading-6">© {s.siteName} — تمامی حقوق محفوظ است.<span className="mx-2" aria-hidden="true">·</span>طراحی توسط <a href="https://asrodev.ir" target="_blank" rel="noopener noreferrer" className="font-bold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">آسرودیزاین</a></div>
       <FooterScripts code={s.footerScripts} />
     </footer>
   );

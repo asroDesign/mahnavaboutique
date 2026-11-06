@@ -62,7 +62,7 @@ export function LiveSearch({ popular = [], compact }: { popular?: string[]; comp
         <input value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} onKeyDown={onKey} placeholder="جست‌وجوی لباس، مدل یا برند…" aria-label="جست‌وجو"
           className={`w-full bg-transparent pr-12 pl-24 text-sm outline-none ${compact ? "h-11" : "h-12"}`} />
         {busy ? <Loader2 className="absolute left-24 h-4 w-4 animate-spin text-emerald-600" /> : q && <button onClick={() => { setQ(""); setRes(null); }} className="absolute left-24 text-slate-400" aria-label="پاک کردن"><X className="h-4 w-4" /></button>}
-        <button onClick={() => go(q)} className="absolute left-1.5 h-9 rounded-xl bg-emerald-600 px-4 text-sm font-bold text-white hover:bg-emerald-700">جست‌وجو</button>
+        <button onClick={() => go(q)} className="live-search-submit absolute left-1.5 h-9 rounded-xl px-4 text-sm font-bold transition">جست‌وجو</button>
       </div>
       {open && (
         <div className="absolute inset-x-0 top-full z-50 mt-2 max-h-[75vh] overflow-y-auto rounded-3xl bg-white p-3 shadow-2xl ring-1 ring-emerald-900/10">
