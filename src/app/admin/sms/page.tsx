@@ -9,6 +9,7 @@ import { ActionButton } from "@/components/client";
 import { SmsTemplateEditor, SmsSender } from "@/components/SmsPanel";
 import { jdate, maskPhone } from "@/lib/util";
 import { JsonForm } from "@/components/client";
+import Link from "next/link";
 
 export default async function SmsPage({ searchParams }: { searchParams: Promise<{ log?: string }> }) {
   const selectedValue = (await searchParams).log;
@@ -24,6 +25,13 @@ export default async function SmsPage({ searchParams }: { searchParams: Promise<
     <>
       <PageHeader title="پنل پیامک پیشرفته" subtitle={`Provider: ${providerName} · کلید API: ${keyOk ? "تنظیم‌شده (مخفی)" : "تنظیم نشده — حالت شبیه‌سازی"} · ${stats.sent.toLocaleString("fa-IR")} موفق / ${stats.failed.toLocaleString("fa-IR")} ناموفق اخیر`}
         actions={<SmsTemplateEditor events={events} provider={s.smsProvider} label="+ الگوی جدید" />} />
+      <Card title="اعلان سفارش پرداخت‌شده به مدیر" className="mb-6">
+        <p className="mb-2 text-sm leading-7 text-slate-600">پس از تأیید موفق پرداخت، برای سفارش جدید به مدیر پیامک می‌فرستیم. شمارهٔ مقصد از تنظیمات کلان خوانده می‌شود؛ متن و شناسهٔ الگوی تأییدشدهٔ این پیام را در رویداد «{SMS_EVENTS.admin_order_paid.title}» پایین همین صفحه تنظیم کنید.</p>
+        <p className="mb-4 text-xs text-slate-500">شمارهٔ مدیر: <b dir="ltr">{s.adminNewOrderSmsPhone ? maskPhone(s.adminNewOrderSmsPhone) : "تنظیم نشده"}</b> · <Link href="/admin/settings" className="text-emerald-700 underline">تنظیم شماره در تنظیمات کلان</Link></p>
+        <JsonForm url="/api/admin/settings" submit="ذخیره تنظیم اعلان سفارش" resetOnDone={false} fields={[
+          { name: "adminNewOrderSmsEnabled", label: "ارسال پیامک سفارش جدید به مدیر", type: "select", half: true, defaultValue: String(s.adminNewOrderSmsEnabled), options: [["1", "فعال"], ["0", "غیرفعال"]] },
+        ]} />
+      </Card>
       <Card title="تنظیمات اتصال پنل پیامک" className="mb-6">
         <p className="mb-4 text-xs leading-6 text-slate-500">تنظیمات اتصال فقط در این بخش مدیریت می‌شود. رمزها نمایش داده نمی‌شوند؛ برای حفظ رمز قبلی ورودی را خالی بگذارید. شناسه و پارامترهای الگوی تاییدشده هر رویداد را در همان الگو تنظیم کنید. پیش از ذخیره، نوع شناسه، نام پارامترها و ترتیب مقادیر را با مستندات پنل انتخابی تطبیق دهید.</p>
         <JsonForm url="/api/admin/settings" submit="ذخیره تنظیمات پیامک" resetOnDone={false} fields={[

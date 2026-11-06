@@ -10,6 +10,7 @@ export const SMS_EVENTS: Record<string, { title: string; vars: string[]; body: s
   otp_login: { title: "کد ورود یک‌بارمصرف (OTP)", vars: ["code"], body: "کد ورود شما: {code}\nاین کد را در اختیار دیگران قرار ندهید." },
   order_created: { title: "ثبت سفارش", vars: ["name", "order", "shop"], body: "{name} عزیز، سفارش {order} در {shop} ثبت شد." },
   payment_success: { title: "پرداخت موفق", vars: ["order", "amount"], body: "پرداخت سفارش {order} به مبلغ {amount} تومان موفق بود." },
+  admin_order_paid: { title: "اعلان سفارش پرداخت‌شده به مدیر", vars: ["order", "amount", "name", "phone"], body: "سفارش جدید {order} با موفقیت پرداخت شد. مبلغ: {amount} تومان. مشتری: {name}، موبایل: {phone}." },
   product_approved: { title: "تأیید محصول", vars: ["product"], body: "محصول {product} تأیید شد." },
   product_rejected: { title: "رد محصول", vars: ["product"], body: "محصول {product} رد شد. لطفاً پنل را بررسی کنید." },
   product_restock: { title: "موجودشدن محصول موردعلاقه", vars: ["product", "url", "unsubscribe"], body: "محصول {product} که پیگیرش بودید موجود شد: {url} — لغو اعلان: {unsubscribe}" },

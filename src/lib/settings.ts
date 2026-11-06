@@ -95,6 +95,8 @@ export const DEFAULT_SETTINGS = {
   smsUsername: "",
   smsPassword: "",
   smsirParameterMap: "",
+  adminNewOrderSmsEnabled: 1,
+  adminNewOrderSmsPhone: "",
   inventoryPolicy: "reserve_on_order",
   supplyDefaultMargin: 15,
   supplyShippingCost: 90000,

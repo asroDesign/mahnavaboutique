@@ -47,7 +47,7 @@ async function seed() {
     const [row] = await db.insert(accounts).values({ code: a.code, name: a.name, level: a.level, type: a.type, parentId: a.parent ? codeToId.get(a.parent) : null }).returning();
     codeToId.set(a.code, row.id);
   }
-  await db.insert(smsTemplates).values(Object.entries(SMS_EVENTS).map(([event, v], i) => ({ event, title: v.title, body: v.body, variables: v.vars, patternId: String(100100 + i) })));
+  await db.insert(smsTemplates).values(Object.entries(SMS_EVENTS).map(([event, v], i) => ({ event, title: v.title, body: v.body, variables: v.vars, patternId: event === "admin_order_paid" ? "" : String(100100 + i), isSystem: event === "admin_order_paid" })));
 
   const pw = hashPassword("Demo@1234");
   const mk = async (name: string, phone: string, role: string) => (await db.insert(users).values({ name, phone, role, passwordHash: pw, email: `${phone}@example.test` }).returning())[0];
@@ -269,7 +269,7 @@ export async function ensureExtras() {
     if (!birthdayTpl) await db.insert(smsTemplates).values({ event: "birthday", title: SMS_EVENTS.birthday.title, body: SMS_EVENTS.birthday.body, variables: ["name"], patternId: "", isActive: true, isSystem: true });
     const [otpTpl] = await db.select().from(smsTemplates).where(eq(smsTemplates.event, "otp_login"));
     if (!otpTpl) await db.insert(smsTemplates).values({ event: "otp_login", title: "کد ورود یک‌بارمصرف (OTP)", body: SMS_EVENTS.otp_login.body, variables: ["code"], patternId: "100099", isSystem: true });
-    for (const event of ["cart_reminder", "cart_discount", "review_request"] as const) {
+    for (const event of ["cart_reminder", "cart_discount", "review_request", "admin_order_paid"] as const) {
       const [tpl] = await db.select({ id: smsTemplates.id }).from(smsTemplates).where(eq(smsTemplates.event, event)).limit(1);
       if (!tpl) {
         const def = SMS_EVENTS[event];

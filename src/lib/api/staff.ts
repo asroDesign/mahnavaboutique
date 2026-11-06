@@ -7,6 +7,7 @@ import { requireApi, rateLimit, hashPassword } from "../auth";
 import { audit } from "../audit";
 import { postJournal, reverseJournal } from "../accounting";
 import { HttpError, int, str, genNumber } from "../util";
+import { phoneNumber } from "../commerce-common";
 import { PERMISSIONS, ROLES } from "../rbac";
 import { DEFAULT_SETTINGS } from "../settings";
 import { sendSms, SMS_EVENTS } from "../sms";
@@ -554,13 +555,16 @@ export const staffRoutes: Route[] = [
         const paths = [...new Set(str(b[k], 10000).split(/\r?\n/).map((x) => x.trim()).filter(Boolean))];
         if (paths.length > 100 || paths.some((x) => x.length > 300 || !x.startsWith("/") || x.startsWith("//") || /[?#\s\u0000-\u001f]/.test(x))) throw new HttpError(400, "مسیر robots نامعتبر است؛ هر مسیر باید با / شروع شود و آدرس کامل نباشد");
         v = paths.join("\n");
+      } else if (k === "adminNewOrderSmsPhone") {
+        v = phoneNumber(b[k]);
+        if (v && !/^09\d{9}$/.test(String(v))) throw new HttpError(400, "شماره همراه مدیر باید یک شماره موبایل معتبر ایران باشد");
       } else if (k === "productPrepDays") v = int(b[k], 0, 30);
       else if (typeof def === "number") v = int(b[k], 0, 1_000_000_000);
       else {
         const limits: Record<string, number> = { announcementText: 300, announcementHref: 500, specialPopupTitle: 120, specialPopupBody: 600, specialPopupButtonLabel: 60, productWarrantyText: 160, productShippingInfo: 600 };
         v = str(b[k], limits[k] ?? (k === "footerScripts" ? 20000 : 1000));
       }
-      if (["announcementEnabled", "specialPopupEnabled"].includes(k) && ![0, 1].includes(Number(v))) throw new HttpError(400, "وضعیت قابلیت نامعتبر است");
+      if (["announcementEnabled", "specialPopupEnabled", "adminNewOrderSmsEnabled"].includes(k) && ![0, 1].includes(Number(v))) throw new HttpError(400, "وضعیت قابلیت نامعتبر است");
       if (["productWarrantyText", "productShippingInfo"].includes(k) && !String(v).trim()) throw new HttpError(400, "متن ضمانت و توضیح ارسال نمی‌تواند خالی باشد");
       if (k === "announcementTheme" && !["sunshine", "forest", "rose"].includes(String(v))) throw new HttpError(400, "رنگ نوار اعلان نامعتبر است");
       if (k === "announcementHref" && v && !(/^\/(?![\\/])[^\u0000-\u001f\\]*$/.test(String(v)) || /^https:\/\//i.test(String(v)))) throw new HttpError(400, "پیوند نوار اعلان باید مسیر داخلی یا HTTPS باشد");
@@ -583,7 +587,7 @@ export const staffRoutes: Route[] = [
       if (k === "snappayApiBaseUrl" && v) { try { const url = new URL(String(v)); if (url.protocol !== "https:" || url.pathname !== "/" || url.search || url.hash || url.username || url.password) throw new Error(); } catch { throw new HttpError(400, "نشانی API اسنپ‌پی باید دامنه HTTPS باشد"); } }
       if (k === "digipayAmountMultiplier" && ![1, 10].includes(Number(v))) throw new HttpError(400, "واحد مبلغ دیجی‌پی نامعتبر است");
       if (k === "digipayPreferredGateway" && ![0, 2].includes(Number(v))) throw new HttpError(400, "روش پرداخت دیجی‌پی نامعتبر است");
-      changes[k] = ["smsApiKey", "smsPassword", "torobpayClientSecret", "torobpayPassword", "nextpayApiKey", "digipayClientSecret", "digipayPassword", "snappayClientSecret", "snappayPassword", "behpardakhtPassword", "pasargadPassword", "vandarApiKey", "paypingApiKey", "sepalApiKey"].includes(k) ? "[configured]" : v;
+      changes[k] = k === "adminNewOrderSmsPhone" ? (v ? "[mobile configured]" : "[cleared]") : ["smsApiKey", "smsPassword", "torobpayClientSecret", "torobpayPassword", "nextpayApiKey", "digipayClientSecret", "digipayPassword", "snappayClientSecret", "snappayPassword", "behpardakhtPassword", "pasargadPassword", "vandarApiKey", "paypingApiKey", "sepalApiKey"].includes(k) ? "[configured]" : v;
       await db.insert(settings).values({ key: k, value: v }).onConflictDoUpdate({ target: settings.key, set: { value: v } });
     }
     await audit(db, { userId: u.id, ...m }, "settings.update", "settings", null, null, changes);

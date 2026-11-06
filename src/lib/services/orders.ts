@@ -13,6 +13,7 @@ import { getSettings } from "../settings";
 import { siteBase } from "../seo";
 import { snapPayCancel } from "../snappay";
 import { sendSms } from "../sms";
+import { phoneNumber } from "../commerce-common";
 import { HttpError, genNumber } from "../util";
 import type { Ctx, DB } from "../types";
 import { consumeConsignmentLots, postConsignmentPayables } from "./inventory-accounting";
@@ -445,6 +446,11 @@ export async function payOrder(ctx: Ctx & { userId: number }, orderId: number, i
     if (u) {
       void sendSms("order_created", u.phone, { name: u.name, order: out.order.number, shop: "" });
       void sendSms("payment_success", u.phone, { order: out.order.number, amount: out.order.total });
+    }
+    const smsSettings = await getSettings();
+    const adminPhone = phoneNumber(smsSettings.adminNewOrderSmsPhone);
+    if (Number(smsSettings.adminNewOrderSmsEnabled) === 1 && /^09\d{9}$/.test(adminPhone)) {
+      void sendSms("admin_order_paid", adminPhone, { order: out.order.number, amount: out.order.total, name: u?.name ?? "مشتری", phone: u?.phone ?? "" });
     }
   }
   return out;

@@ -58,6 +58,7 @@ export default async function SettingsPage() {
           { name: "reviewRewardPoints", label: "امتیاز ثبت دیدگاه پس از تحویل کالا (۰ = غیرفعال)", type: "number", half: true, defaultValue: s.reviewRewardPoints },
           { name: "releasePolicy", label: "سیاست آزادسازی وجه", type: "select", half: true, defaultValue: s.releasePolicy, options: [["on_customer_confirm", "پس از تأیید تحویل"], ["on_delivery", "پس از ثبت تحویل"]] },
           { name: "supportPhone", label: "تلفن پشتیبانی", half: true, defaultValue: s.supportPhone },
+          { name: "adminNewOrderSmsPhone", label: "شماره همراه مدیر برای اعلان سفارش پرداخت‌شده", half: true, placeholder: "09123456789", defaultValue: s.adminNewOrderSmsPhone },
           { name: "supportEmail", label: "ایمیل پشتیبانی", half: true, defaultValue: s.supportEmail },
           { name: "supportHours", label: "ساعات پاسخگویی", half: true, defaultValue: s.supportHours },
           { name: "orderExpiryMinutes", label: "لغو خودکار سفارش پرداخت‌نشده (دقیقه، ۰=غیرفعال)", type: "number", half: true, defaultValue: s.orderExpiryMinutes },
