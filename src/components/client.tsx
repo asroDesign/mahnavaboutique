@@ -250,7 +250,7 @@ export function ImageUploader({ value, onChange, max = 8, allowLibrary = true, f
         )}
       </div>
       {allowLibrary && <button type="button" onClick={openLibrary} className="btn-ghost"><Images className="h-4 w-4" />انتخاب از مرکز فایل</button>}
-      <p className="text-xs text-slate-400">فقط آپلود فایل از دستگاه شما — JPG، PNG و WebP تا ۳ مگابایت. ستاره = تصویر اصلی.</p>
+      <p className="text-xs text-slate-400">فقط آپلود فایل از دستگاه شما — JPG، PNG و WebP تا ۶ مگابایت. ستاره = تصویر اصلی.</p>
       {allowLibrary && libraryOpen && <div className="fixed inset-0 z-[110] flex items-end justify-center bg-slate-950/55 sm:items-center sm:p-4" onMouseDown={e=>{if(e.target===e.currentTarget&&!libraryEditBusy)setLibraryOpen(false)}}>
         <div className="flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
           <header className="flex flex-wrap items-center justify-between gap-3 border-b p-4 sm:p-5"><div><b className="block">انتخاب از مرکز فایل</b><small className="text-slate-500">انتخاب‌ها را در پایان با دکمه ثبت اعمال کنید.</small></div><div className="flex items-center gap-2"><label className="btn-primary cursor-pointer">{libraryUploadBusy?<Loader2 className="size-4 animate-spin"/>:<Upload className="size-4"/>}بارگذاری تصویر<input ref={libraryInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={e=>uploadToLibrary(e.target.files)}/></label><button type="button" onClick={()=>setLibraryOpen(false)} className="rounded-full p-2 hover:bg-slate-100"><X className="size-5"/></button></div></header>

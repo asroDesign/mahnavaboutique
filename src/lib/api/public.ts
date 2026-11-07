@@ -365,13 +365,13 @@ export const publicRoutes: Route[] = [
     if (!file || typeof file === "string") throw new HttpError(400, "فایلی ارسال نشده است");
     const kind = String(form?.get("kind") ?? "image");
     const KINDS: Record<string, { types: string[]; mb: number; label: string; staffOnly?: boolean }> = {
-      image: { types: ["image/jpeg", "image/png", "image/webp"], mb: 3, label: "JPG، PNG و WebP" },
-      profile: { types: ["image/jpeg", "image/png", "image/webp"], mb: 3, label: "JPG، PNG و WebP" },
+      image: { types: ["image/jpeg", "image/png", "image/webp"], mb: 6, label: "JPG، PNG و WebP" },
+      profile: { types: ["image/jpeg", "image/png", "image/webp"], mb: 6, label: "JPG، PNG و WebP" },
       document: { types: ["image/jpeg", "image/png", "image/webp", "application/pdf"], mb: 8, label: "JPG، PNG، WebP یا PDF" },
       video: { types: ["video/mp4", "video/webm"], mb: 40, label: "MP4 یا WebM" },
       audio: { types: ["audio/mpeg", "audio/wav", "audio/ogg"], mb: 40, label: "MP3، WAV یا OGG", staffOnly: true },
       hero: { types: ["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/webm"], mb: 40, label: "تصویر، GIF یا ویدیو (MP4/WebM)", staffOnly: true },
-      editor: { types: ["image/jpeg", "image/png", "image/webp", "image/gif"], mb: 3, label: "تصویر یا GIF" },
+      editor: { types: ["image/jpeg", "image/png", "image/webp", "image/gif"], mb: 6, label: "تصویر یا GIF" },
       library: { types: ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf", "video/mp4", "video/webm"], mb: 40, label: "تصویر، PDF یا ویدیو", staffOnly: true },
     };
     const k = KINDS[kind] ?? KINDS.image;
