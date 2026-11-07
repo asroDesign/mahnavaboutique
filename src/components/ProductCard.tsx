@@ -2,12 +2,13 @@ import Link from "next/link";
 import { Star, Store, Flame } from "lucide-react";
 import type { ShopProduct } from "@/lib/queries";
 import { currencyUnit, faNum } from "@/lib/util";
+import { siteBrandText } from "@/lib/brand";
 import { Img } from "./ui";
 import { QuickViewButton } from "./QuickView";
 import { FavoriteButton } from "./CustomerSelfService";
 import { ProductCompareButton } from "./ProductCompareButton";
 
-export function ProductCard({ p }: { p: ShopProduct }) {
+export function ProductCard({ p, siteName }: { p: ShopProduct; siteName: string }) {
   return (
     <div className="boutique-product group relative flex flex-col overflow-hidden rounded-3xl border border-emerald-900/5 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-lime-300 hover:shadow-xl hover:shadow-emerald-900/10">
       <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-b from-[#f3efe2] to-white">
@@ -22,7 +23,7 @@ export function ProductCard({ p }: { p: ShopProduct }) {
         {!p.inquiryOnly && !p.priceUnavailable && <div className="absolute inset-x-2 bottom-2 translate-y-2 opacity-100 transition md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"><QuickViewButton id={p.id} /></div>}
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-3.5">
-        <div className="flex items-center justify-between text-[11px] text-slate-500"><span className="font-bold text-emerald-700">{p.brand}</span><span dir="ltr" className="truncate">{p.partNumber}</span></div>
+        <div className="flex items-center justify-between text-[11px] text-slate-500"><span className="font-bold text-emerald-700">{siteBrandText(p.brand || siteName, siteName)}</span><span dir="ltr" className="truncate">{p.partNumber}</span></div>
         <Link href={`/products/${p.slug}`} className="line-clamp-2 min-h-10 text-[13px] font-bold leading-5 text-slate-800 hover:text-emerald-700">{p.nameFa}</Link>
         <div className="flex items-center gap-2 text-[11px] text-slate-500">
           {p.reviewCount > 0 ? <span className="flex items-center gap-0.5 text-amber-500"><Star className="h-3 w-3 fill-amber-400" />{faNum(p.rating)} <span className="text-slate-400">({faNum(p.reviewCount)})</span></span> : <span className="rounded bg-lime-50 px-1.5 text-lime-700">جدید</span>}

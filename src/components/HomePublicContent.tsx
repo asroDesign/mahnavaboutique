@@ -12,13 +12,15 @@ import { HomeIntroSection } from "./HomeIntroSection";
 import { Img } from "./ui";
 import styles from "./MinimalHome.module.css";
 import { hasBoutiqueContext } from "@/lib/boutique-content";
+import { siteBrandText } from "@/lib/brand";
 
 /** Keep catalog navigation near the top while allowing one optional intro ahead of it. */
 export function HomePublicContent({ blocks, data, children }: { blocks: SitePageBlock[]; data: HomeData; children?: ReactNode }) {
+  blocks = JSON.parse(JSON.stringify(blocks, (_key, value) => typeof value === "string" ? siteBrandText(value, data.st.siteName) : value)) as SitePageBlock[];
   const categorySource = blocks.find(block => block.type === "store_section" && block.sectionId === "categories");
   const categoryBlock = categorySource && hasBoutiqueContext(categorySource.title, categorySource.body)
     ? categorySource
-    : categorySource ? { ...categorySource, title: "دسته‌بندی پوشاک زنانه", body: "مدل‌های مورد علاقه‌تان را از میان مجموعهٔ بوتیک پیدا کنید." } : undefined;
+    : categorySource ? { ...categorySource, title: "دسته‌بندی پوشاک زنانه", body: `مدل‌های مورد علاقه‌تان را از میان مجموعهٔ ${data.st.siteName} پیدا کنید.` } : undefined;
   const rootCategories = data.cats.filter(category => !category.parent_id);
   const selectedCategoryIds = categoryBlock?.options?.categoryIds;
   const categories = selectedCategoryIds === undefined ? rootCategories : rootCategories.filter(category => selectedCategoryIds.includes(category.id));
@@ -27,7 +29,7 @@ export function HomePublicContent({ blocks, data, children }: { blocks: SitePage
   const freshSource = blocks.find(block => block.type === "store_section" && block.sectionId === "fresh");
   const freshBlock = freshSource && hasBoutiqueContext(freshSource.title, freshSource.body)
     ? freshSource
-    : freshSource ? { ...freshSource, title: "تازه‌رسیده‌های بوتیک", body: "جدیدترین لباس‌های زنانه را ببینید." }
+    : freshSource ? { ...freshSource, title: `تازه‌رسیده‌های ${data.st.siteName}`, body: "جدیدترین لباس‌های زنانه را ببینید." }
       : { type: "store_section" as const, sectionId: "fresh", title: "", body: "", items: [] };
   const selectedIds = freshBlock.options?.productIds;
   const categoryId = freshBlock.options?.categoryId;
@@ -43,7 +45,7 @@ export function HomePublicContent({ blocks, data, children }: { blocks: SitePage
   ))).map(block => {
     if (block.type !== "store_section" || hasBoutiqueContext(block.title, block.body)) return block;
     const copy: Record<string, { title: string; body: string }> = {
-      popular: { title: "محبوب‌ترین‌های بوتیک", body: "انتخاب‌های پرطرفدار مشتریان برای استایل روزمره و موقعیت‌های خاص." },
+      popular: { title: `محبوب‌ترین‌های ${data.st.siteName}`, body: "انتخاب‌های پرطرفدار مشتریان برای استایل روزمره و موقعیت‌های خاص." },
       deals: { title: "پیشنهادهای ویژه", body: "لباس‌های منتخب را با قیمت‌های به‌روز ببینید." },
       blog: { title: `از مجله ${data.st.siteName}`, body: "راهنمای پوشاک، انتخاب لباس و ساختن استایل شخصی." },
     };
@@ -53,7 +55,7 @@ export function HomePublicContent({ blocks, data, children }: { blocks: SitePage
 
   return (
     <main className={`boutique-home ${styles.home}`}>
-      {introBlock && <PageBlockFrame block={introBlock}><HomeIntroSection block={introBlock} products={data.all} /></PageBlockFrame>}
+      {introBlock && <PageBlockFrame block={introBlock}><HomeIntroSection block={introBlock} products={data.all} siteName={data.st.siteName} /></PageBlockFrame>}
       <PageBlockFrame block={categoryBlock ?? { type: "store_section", sectionId: "categories" }}>
         <section className={styles.categorySection} aria-labelledby="home-categories-title">
           <div className={styles.heading}>
@@ -90,7 +92,7 @@ export function HomePublicContent({ blocks, data, children }: { blocks: SitePage
             <div><h2 id="home-newest-title">{freshBlock.title || "جدیدترین محصولات"}</h2>{freshBlock.body && <p>{freshBlock.body}</p>}</div>
             <Link href="/shop?sort=new">مشاهده همه <ArrowLeft size={16} /></Link>
           </div>
-          {newest.length ? <div className={styles.products}>{newest.map(product => <ProductCard key={product.id} p={product} />)}</div>
+          {newest.length ? <div className={styles.products}>{newest.map(product => <ProductCard key={product.id} p={product} siteName={data.st.siteName} />)}</div>
             : <div className={styles.empty}><Shirt size={32} strokeWidth={1} /><p>محصولات جدید به‌زودی به فروشگاه اضافه می‌شوند.</p><Link href="/shop">مشاهده فروشگاه <ArrowLeft size={16} /></Link></div>}
         </section>
       </PageBlockFrame>}

@@ -7,6 +7,7 @@ import { BuyBox, type OfferView, type VariantView } from "./BuyBox";
 import { Gallery } from "./Gallery";
 import { Stars } from "./Community";
 import styles from "./QuickView.module.css";
+import { siteBrandText } from "@/lib/brand";
 
 export type { OfferView };
 type Data = {
@@ -57,7 +58,7 @@ function QuickViewModal({ id, onClose }: { id: number; onClose: () => void }) {
             <div className={styles.details}>
               <div className="flex flex-wrap gap-1.5 text-[11px]">
                 {p.category && <span className="rounded-full bg-amber-50 px-2.5 py-1 font-bold text-amber-800 ring-1 ring-amber-200">{p.category}</span>}
-                <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-bold text-emerald-800 ring-1 ring-emerald-200">🌿 {p.brand}</span>
+                <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-bold text-emerald-800 ring-1 ring-emerald-200">🌿 {siteBrandText(p.brand, data.store.siteName)}</span>
               </div>
               <h2 className="text-xl font-black leading-9 text-emerald-950">{p.nameFa}</h2>
               <div className="flex items-center gap-2 text-xs"><Stars value={data.rating.avg} size={14} /><span className="text-slate-500">{data.rating.n ? `${fa(data.rating.avg)} از ${fa(data.rating.n)} دیدگاه` : "بدون دیدگاه"}</span></div>

@@ -113,10 +113,10 @@ export function LoginForm({ siteName, siteLogoMediaId = 0, initialIntent = "logi
         <button type="button" onClick={() => { setMode(mode === "otp" ? "password" : "otp"); setStep("phone"); setErr(""); }} className="auth-password-toggle">{mode === "otp" ? <><KeyRound className="size-4"/>ورود با رمز عبور</> : <><Smartphone className="size-4"/>ورود با کد یک‌بارمصرف</>}</button>
       </section>
       <aside className="auth-story">
-        <img src="/images/boutique-editorial.svg" alt="مجموعه پوشاک زنانه بوتیک مه لقا" className="auth-story-image" loading="lazy" decoding="async" />
+        <img src="/images/boutique-editorial.svg" alt={`مجموعه پوشاک زنانه ${siteName}`} className="auth-story-image" loading="lazy" decoding="async" />
         <div className="auth-story-shade" />
         <Link href="/" className="auth-story-top"><LockKeyhole className="size-4"/> خرید امن و مطمئن</Link>
-        <div className="auth-story-copy"><span>MAHLEGHA BOUTIQUE · EST. 2020</span><h2>استایلی که<br/>شبیه خودت است.</h2><p>انتخابی از پوشاک زنانهٔ خاص، با جزئیاتی که هر روزت را زیباتر می‌کند.</p><div className="auth-story-points"><span><BadgeCheck/>انتخاب‌شده با سلیقه</span><span><ShieldCheck/>پرداخت و خرید امن</span></div></div>
+        <div className="auth-story-copy"><span>{siteName} · EST. 2020</span><h2>استایلی که<br/>شبیه خودت است.</h2><p>انتخابی از پوشاک زنانهٔ خاص، با جزئیاتی که هر روزت را زیباتر می‌کند.</p><div className="auth-story-points"><span><BadgeCheck/>انتخاب‌شده با سلیقه</span><span><ShieldCheck/>پرداخت و خرید امن</span></div></div>
         <Link href="/shop" className="auth-story-link">دیدن تازه‌ترین مدل‌ها <ArrowRight className="size-4 rotate-180"/></Link>
       </aside>
     </div>

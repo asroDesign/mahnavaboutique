@@ -12,6 +12,7 @@ import { getSiteMenu } from "@/lib/site-menus";
 import { SiteNavMenus, type PublicMenuItem } from "./SiteNavMenus";
 import { ThemeToggle } from "./ThemeToggle";
 import { PwaInstallButton } from "./PwaInstallButton";
+import { siteBrandText } from "@/lib/brand";
 
 export async function SiteHeader({ minimal = false }: { minimal?: boolean } = {}) {
   const [u, fests, cats, st, headerMenu, mobileMenu] = await Promise.all([getUser(), activeFestivals(), categoriesWithCounts(), getSettings(), getSiteMenu("header").catch(() => null), getSiteMenu("mobile").catch(() => null)]);
@@ -37,8 +38,14 @@ export async function SiteHeader({ minimal = false }: { minimal?: boolean } = {}
   const galleryItem: PublicMenuItem = { id: -99, label: "گالری محصولات", href: "/gallery", targetBlank: false, children: [] };
   const hasGallery = (items: PublicMenuItem[]): boolean => items.some(item => item.href === "/gallery" || hasGallery(item.children));
   const withGallery = (items: PublicMenuItem[]) => hasGallery(items) ? items : [...items, galleryItem];
-  const headerItems = headerMenu?.items?.length ? withGallery(headerMenu.items) : [];
-  const mobileItems = mobileMenu?.items?.length ? withGallery(mobileMenu.items) : [];
+  const brandMenuItems = (items: PublicMenuItem[]): PublicMenuItem[] => items.map((item) => ({
+    ...item,
+    label: siteBrandText(item.label, st.siteName),
+    customHtml: siteBrandText(item.customHtml, st.siteName),
+    children: brandMenuItems(item.children),
+  }));
+  const headerItems = headerMenu?.items?.length ? withGallery(brandMenuItems(headerMenu.items)) : [];
+  const mobileItems = mobileMenu?.items?.length ? withGallery(brandMenuItems(mobileMenu.items)) : [];
   fallbackMenu.splice(minimal ? 2 : 3, 0, galleryItem);
   return (
     <>
@@ -49,7 +56,7 @@ export async function SiteHeader({ minimal = false }: { minimal?: boolean } = {}
             <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 shrink-0 text-lime-300" />هزینهٔ ارسال پیش از ثبت سفارش مشخص می‌شود</span>
             <span className="flex items-center gap-1.5"><RotateCcw className="h-3.5 w-3.5 text-lime-300" />{st.returnDays.toLocaleString("fa-IR")} روز مهلت بازگشت طبق شرایط فروشگاه</span>
           </div>
-          <Link href="/contact" className="flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5 text-lime-300" />{st.supportPhone ? <>پشتیبانی <b dir="ltr">{st.supportPhone}</b> · </> : "بوتیک مه لقا · "}{st.supportHours}</Link>
+          <Link href="/contact" className="flex items-center gap-1.5"><Headphones className="h-3.5 w-3.5 text-lime-300" />{st.supportPhone ? <>پشتیبانی <b dir="ltr">{st.supportPhone}</b> · </> : `${st.siteName} · `}{st.supportHours}</Link>
         </div>
       </div>}
       {fest && !minimal && (
@@ -66,7 +73,7 @@ export async function SiteHeader({ minimal = false }: { minimal?: boolean } = {}
             <SiteBrand name={st.siteName} logoMediaId={Number(st.siteLogoMediaId)} />
             <span className="hidden leading-tight sm:block"><b className="block text-xl font-semibold text-slate-900">{st.siteName}</b>{!minimal && <span className="text-[10px] text-slate-500">{st.siteTagline}</span>}</span>
           </Link>
-          <div className={minimal ? "hidden flex-1 items-center lg:flex" : "hidden flex-1 md:block"}>{minimal ? <SiteNavMenus mode="desktopOnly" headerItems={headerItems} mobileItems={mobileItems} fallbackItems={headerMenu?.enabled === false ? [] : fallbackMenu} /> : <LiveSearch popular={popular} />}</div>
+          <div className={minimal ? "hidden flex-1 items-center lg:flex" : "hidden flex-1 md:block"}>{minimal ? <SiteNavMenus mode="desktopOnly" headerItems={headerItems} mobileItems={mobileItems} fallbackItems={headerMenu?.enabled === false ? [] : fallbackMenu} /> : <LiveSearch popular={popular} siteName={st.siteName} />}</div>
           <nav className="mr-auto flex items-center gap-1 md:mr-0">
             <ThemeToggle />
             <SiteNavMenus mode="mobileOnly" headerItems={headerItems} mobileItems={mobileItems} fallbackItems={mobileMenu?.enabled === false ? [] : fallbackMenu} showMobile={mobileMenu?.enabled !== false}/>
@@ -78,7 +85,7 @@ export async function SiteHeader({ minimal = false }: { minimal?: boolean } = {}
             </Link>
           </nav>
         </div>
-        <div className="px-4 pb-3 md:hidden"><LiveSearch compact popular={popular} /></div>
+        <div className="px-4 pb-3 md:hidden"><LiveSearch compact popular={popular} siteName={st.siteName} /></div>
         <div className={minimal ? "hidden" : "hidden border-t border-slate-100 md:block"}>
           <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 text-sm">
             <div className="group relative">
@@ -101,7 +108,7 @@ export async function SiteHeader({ minimal = false }: { minimal?: boolean } = {}
           </div>
         </div>
       </header>
-      <PwaInstallButton />
+      <PwaInstallButton siteName={st.siteName} />
     </>
   );
 }

@@ -3,12 +3,12 @@ import { ArrowLeft, Shirt } from "lucide-react";
 import type { ShopProduct } from "@/lib/queries";
 import { Img } from "./ui";
 
-export function BoutiqueProductGallery({ products }: { products: ShopProduct[] }) {
+export function BoutiqueProductGallery({ products, siteName }: { products: ShopProduct[]; siteName: string }) {
   return (
     <section id="product-gallery" className="boutique-gallery" aria-labelledby="boutique-gallery-title">
       <div className="boutique-section-title">
         <div>
-          <span className="boutique-eyebrow">THE MAHLEGHA EDIT</span>
+          <span className="boutique-eyebrow">{siteName} · COLLECTION</span>
           <h2 id="boutique-gallery-title">گالری محصولات</h2>
           <p>برای دیدن جزئیات هر محصول، تصویر آن را انتخاب کنید.</p>
         </div>

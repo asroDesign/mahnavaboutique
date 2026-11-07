@@ -6,6 +6,7 @@ import { ArrowLeft, Image as ImageIcon, Sparkles } from "lucide-react";
 import type { SitePageBlock } from "@/db/schema";
 import type { ShopProduct } from "@/lib/queries";
 import { currencyUnit, faNum } from "@/lib/util";
+import { siteBrandText } from "@/lib/brand";
 import { Img } from "./ui";
 import styles from "./HomeIntro.module.css";
 
@@ -18,7 +19,7 @@ function shuffled<T,>(items: T[]) {
   return result;
 }
 
-export function HomeIntroSection({ block, products, preview = false }: { block: SitePageBlock; products: ShopProduct[]; preview?: boolean }) {
+export function HomeIntroSection({ block, products, siteName, preview = false }: { block: SitePageBlock; products: ShopProduct[]; siteName: string; preview?: boolean }) {
   const mode = block.options?.introMode ?? "random_products";
   const productMap = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
   const selectedIdsKey = (block.options?.productIds ?? []).join(",");
@@ -54,14 +55,14 @@ export function HomeIntroSection({ block, products, preview = false }: { block: 
     <div className={styles.copy}>
       <span className={styles.eyebrow}>A LITTLE SOMETHING FOR YOU</span>
       <h2>{block.title || "انتخاب‌های تازه برای شما"}</h2>
-      <p>{block.body || "چند انتخاب از میان لباس‌های بوتیک مه‌لقا؛ هر بار با ترکیبی تازه."}</p>
+      <p>{block.body || `چند انتخاب از میان لباس‌های ${siteName}؛ هر بار با ترکیبی تازه.`}</p>
       <Link href={block.href || "/shop"} className={styles.action}>{block.buttonLabel || "کشف همه محصولات"}<ArrowLeft size={16}/></Link>
-      <span className={styles.edition}>MAHLEGHA · SELECTED WITH CARE</span>
+      <span className={styles.edition}>{siteName} · SELECTED WITH CARE</span>
     </div>
     <div className={styles.products}>
       {featured.map((product, index) => <Link key={product.id} href={`/products/${product.slug}`} className={`${styles.product} ${styles[`product${index + 1}`]}`}>
         <span className={styles.productImage}>{product.imageId ? <Img id={product.imageId} alt={product.nameFa} variant="card" sizes="(max-width: 700px) 42vw, 220px"/> : <ImageIcon size={30}/>}</span>
-        <span className={styles.productDetails}><span>{product.brand}</span><b>{product.nameFa}</b><strong>{product.minPrice ? `${faNum(product.minPrice)} ${currencyUnit()}` : "مشاهده محصول"}</strong></span>
+        <span className={styles.productDetails}><span>{siteBrandText(product.brand, siteName)}</span><b>{product.nameFa}</b><strong>{product.minPrice ? `${faNum(product.minPrice)} ${currencyUnit()}` : "مشاهده محصول"}</strong></span>
       </Link>)}
     </div>
   </section>;

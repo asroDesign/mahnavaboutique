@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
+import { getSettings } from "@/lib/settings";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const settings = await getSettings();
   return {
     id: "/",
-    name: "بوتیک زنانه مه لقا",
-    short_name: "مه لقا",
-    description: "فروشگاه آنلاین پوشاک و بوتیک زنانه مه لقا",
+    name: settings.siteName,
+    short_name: settings.siteName,
+    description: `فروشگاه آنلاین پوشاک زنانه ${settings.siteName}`,
     lang: "fa-IR",
     dir: "rtl",
     start_url: "/",

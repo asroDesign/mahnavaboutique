@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
     },
-    appleWebApp: { capable: true, title: "مه لقا", statusBarStyle: "default" },
+    appleWebApp: { capable: true, title: s.siteName, statusBarStyle: "default" },
     title: { default: s.homeSeoTitle, template: `%s | ${s.siteName}` },
     description: s.homeSeoDescription,
     applicationName: s.siteName,

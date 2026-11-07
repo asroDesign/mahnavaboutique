@@ -26,6 +26,7 @@ import { FavoriteButton } from "@/components/CustomerSelfService";
 import { ProductCompareButton } from "@/components/ProductCompareButton";
 import { ProductAlerts } from "@/components/ProductAlerts";
 import { ProductCard } from "@/components/ProductCard";
+import { siteBrandText } from "@/lib/brand";
 import { AnswerForm, QuestionForm, ReviewForm, ReviewImages, RoleBadge, Stars, VoteButtons } from "@/components/Community";
 import { seoMetadata, siteBase } from "@/lib/seo";
 
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const row = await load((await params).slug);
   if (!row) return { title: "محصول یافت نشد" };
   const settings = await getSettings();
-  return seoMetadata(settings, { title: row.p.seoTitle || row.p.nameFa, description: row.p.metaDesc || stripHtml(row.p.shortDesc) || settings.homeSeoDescription, keywords: row.p.seoKeywords ?? [], path: `/products/${row.p.slug}`, imageId: row.p.seoImageId || row.p.mainImageId });
+  return seoMetadata(settings, { title: siteBrandText(row.p.seoTitle || row.p.nameFa, settings.siteName), description: siteBrandText(row.p.metaDesc || stripHtml(row.p.shortDesc) || settings.homeSeoDescription, settings.siteName), keywords: (row.p.seoKeywords ?? []).map((keyword) => siteBrandText(keyword, settings.siteName)), path: `/products/${row.p.slug}`, imageId: row.p.seoImageId || row.p.mainImageId });
 }
 
 export default async function ProductPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ variant?: string }> }) {
@@ -153,7 +154,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
       : undefined;
   const jsonLd = offerData || approved.length ? {
     "@context": "https://schema.org", "@type": "Product", name: p.nameFa, sku: p.sku,
-    ...(p.brand ? { brand: { "@type": "Brand", name: p.brand } } : {}),
+    ...(p.brand ? { brand: { "@type": "Brand", name: siteBrandText(p.brand, s.siteName) } } : {}),
     ...(p.shortDesc ? { description: stripHtml(p.shortDesc) } : {}),
     ...(imgs.length || p.mainImageId ? { image: [...new Set([...(p.mainImageId ? [p.mainImageId] : []), ...imgs.map((image) => image.mediaId)])].map((id) => new URL(`/api/media/${id}`, jsonBase).toString()) } : {}),
     url: productUrl,
@@ -171,7 +172,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
           <div className={styles.gallery}><Gallery editorial promotionSlotId={`product-promotion-${p.id}`} ids={galleryIds} alt={p.nameFa} videoId={p.videoMediaId} actions={<>{(!p.inquiryOnly && !variants.some((v) => v.inquiryOnly)) && <ProductPriceHistory productId={p.id}/>}<FavoriteButton productId={p.id}/><ProductCompareButton productId={p.id}/></>} /></div>
           <div className={styles.summary}>
             <div className={styles.eyebrow}>
-              <Link href={brandPage ? `/brands/${brandPage.slug}` : `/shop?brand=${encodeURIComponent(p.brand)}`}>{p.brand}</Link>
+              <Link href={brandPage ? `/brands/${brandPage.slug}` : `/shop?brand=${encodeURIComponent(p.brand)}`}>{siteBrandText(p.brand, s.siteName)}</Link>
               {row.cat && <><span aria-hidden="true" className="text-slate-300">/</span><Link href={`/shop?cat=${row.cat.id}`} className="text-slate-500">{row.cat.name}</Link></>}
             </div>
             <h1 className={styles.title}>{p.nameFa}</h1>
@@ -290,12 +291,12 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
 
         {smartRecommendations.length > 0 && <section id="smart-recommendations" className={styles.recommendations}>
           <div className="mb-5 flex items-start gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-rose-100 text-rose-700"><Sparkles className="size-5" /></span><div><h2 className="text-xl font-black text-rose-950">پیشنهاد هوشمند خرید</h2><p className="mt-1 text-sm leading-6 text-slate-500">انتخاب‌هایی که می‌توانند کنار این لباس، استایل شما را کامل کنند.</p></div></div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{smartRecommendations.map(({ product, reason }) => <article key={product.id} className="flex min-w-0 flex-col gap-2"><ProductCard p={product} /><p className="rounded-xl bg-rose-50 px-3 py-2 text-xs leading-5 text-rose-900">{reason}</p></article>)}</div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{smartRecommendations.map(({ product, reason }) => <article key={product.id} className="flex min-w-0 flex-col gap-2"><ProductCard p={product} siteName={s.siteName} /><p className="rounded-xl bg-rose-50 px-3 py-2 text-xs leading-5 text-rose-900">{reason}</p></article>)}</div>
         </section>}
-        {crossSells.length > 0 && <section><h2 className="mb-5 text-2xl font-black text-emerald-950">شاید این‌ها را هم بخواهید</h2><div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{crossSells.map((r) => <ProductCard key={r.id} p={r} />)}</div></section>}
+        {crossSells.length > 0 && <section><h2 className="mb-5 text-2xl font-black text-emerald-950">شاید این‌ها را هم بخواهید</h2><div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{crossSells.map((r) => <ProductCard key={r.id} p={r} siteName={s.siteName} />)}</div></section>}
         {rel.length > 0 && (
           <section><h2 className="mb-5 flex items-center gap-2 text-2xl font-black text-emerald-950"><Leaf className="h-6 w-6 text-lime-500" />محصولات مرتبط</h2>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{rel.map((r) => <ProductCard key={r.id} p={r} />)}</div></section>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{rel.map((r) => <ProductCard key={r.id} p={r} siteName={s.siteName} />)}</div></section>
         )}
       </main>
       <SiteFooter />

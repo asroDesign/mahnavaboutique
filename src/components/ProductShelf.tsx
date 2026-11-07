@@ -23,7 +23,7 @@ export function ProductShelf({ block, data }: { block: SitePageBlock; data: Home
       <Link href={href}>مشاهده همه <ArrowLeft size={16} /></Link>
     </div>
     {products.length
-      ? <div className={styles.products}>{products.map(product => <ProductCard key={product.id} p={product} />)}</div>
+      ? <div className={styles.products}>{products.map(product => <ProductCard key={product.id} p={product} siteName={data.st.siteName} />)}</div>
       : <div className={styles.empty}><Shirt size={30} strokeWidth={1} /><p>محصولی برای این بخش پیدا نشد.</p><Link href={href}>مشاهده فروشگاه <ArrowLeft size={16} /></Link></div>}
   </section>;
 }

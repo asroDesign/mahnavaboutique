@@ -1,6 +1,8 @@
-/** Replace legacy store branding and supported placeholders at render/send time. */
-const legacyBrand = String.fromCharCode(1587, 1576, 1586, 1740, 1606, 1607);
+/** Resolve supported site-name placeholders and legacy store names at render/send time. */
+const legacyStoreNames = /(?:بوتیک(?:\s|‌)*مه[\s‌]*لقا|(?<![\p{L}])مه[\s‌]*لقا(?![\p{L}])|سبزینه)/gu;
 
 export function siteBrandText(value: string | null | undefined, siteName: string): string {
-  return (value ?? "").replace(/\{\{\s*(?:siteName|shop)\s*\}\}/g, siteName).split(legacyBrand).join(siteName);
+  return (value ?? "")
+    .replace(legacyStoreNames, () => siteName)
+    .replace(/\{\{\s*(?:siteName|shop)\s*\}\}/g, siteName);
 }

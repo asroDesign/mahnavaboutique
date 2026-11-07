@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ComparePage({ searchParams }: { searchParams: Promise<{ ids?: string }> }) {
   const rawIds = (await searchParams).ids?.split(",") ?? [];
   const ids = [...new Set(rawIds.map((value) => Number(value)).filter((id) => Number.isSafeInteger(id) && id > 0))].slice(0, 4);
-  const categoryRows = await db.select({ id: categories.id, name: categories.name }).from(categories);
+  const [settings, categoryRows] = await Promise.all([getSettings(), db.select({ id: categories.id, name: categories.name }).from(categories)]);
   let catalog: Awaited<ReturnType<typeof listShopProducts>> = [];
   let productRows: { p: typeof products.$inferSelect }[] = [];
   let variantRows: (typeof productVariants.$inferSelect)[] = [];
@@ -49,5 +49,5 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
       })),
     }];
   });
-  return <><SiteHeader/><main className="mx-auto min-h-[55vh] max-w-7xl px-4 py-8"><ProductCompareTable products={compareProducts}/></main><SiteFooter/></>;
+  return <><SiteHeader/><main className="mx-auto min-h-[55vh] max-w-7xl px-4 py-8"><ProductCompareTable products={compareProducts} siteName={settings.siteName}/></main><SiteFooter/></>;
 }

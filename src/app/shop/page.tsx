@@ -150,7 +150,7 @@ export default async function Shop({ searchParams }: { searchParams: Promise<Raw
               <Link href={`/customer/supply?pn=${encodeURIComponent(sp.q ?? "")}`} className="btn-primary">ثبت درخواست تأمین</Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 sm:gap-4">{shown.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 sm:gap-4">{shown.map((p) => <ProductCard key={p.id} p={p} siteName={st.siteName} />)}</div>
           )}
           {pages > 1 && (
             <nav aria-label="صفحه‌بندی محصولات" className="mt-8 flex w-full max-w-full min-w-0 flex-wrap items-center justify-center gap-1 px-1">

@@ -11,6 +11,7 @@ import { SiteBlockContent } from "./SiteBlockContent";
 import { PageBlockFrame } from "./PageBlockFrame";
 import { ShortcodeInsert } from "./ShortcodeInsert";
 import { builderId, createBlock } from "@/lib/page-builder";
+import { siteBrandText } from "@/lib/brand";
 
 type Page = {
   id: number; title: string; slug: string; template: string; summary: string | null;
@@ -27,8 +28,8 @@ const parseItems = (value: string) => value.split("\n").map((line) => line.trim(
   const [title, ...rest] = line.split("|"); return { title: title.trim(), body: rest.join("|").trim() };
 });
 const pagePresets: Record<string, { label: string; template: string; blocks: () => Block[] }> = {
-  story: { label: "داستان بوتیک مه‌لقا", template: "editorial", blocks: () => [
-    { ...newBlock("hero"), title: "داستان مه‌لقا؛ انتخابی برای استایل شما", body: "در بوتیک مه‌لقا لباس‌هایی برای روزهای معمولی و لحظه‌های به‌یادماندنی پیدا می‌کنید.", buttonLabel: "مشاهده مجموعه", href: "/shop", options: { badge: "بوتیک پوشاک زنانه" } },
+  story: { label: "داستان {{siteName}}", template: "editorial", blocks: () => [
+    { ...newBlock("hero"), title: "داستان {{siteName}}؛ انتخابی برای استایل شما", body: "در {{siteName}} لباس‌هایی برای روزهای معمولی و لحظه‌های به‌یادماندنی پیدا می‌کنید.", buttonLabel: "مشاهده مجموعه", href: "/shop", options: { badge: "بوتیک پوشاک زنانه" } },
     { ...newBlock("text"), title: "توجه به جزئیات", body: "هر لباس با مشخصات روشن، رنگ‌ها و تنوع‌های قابل انتخاب معرفی می‌شود تا خرید آگاهانه‌تری داشته باشید." },
     { ...newBlock("features"), title: "خریدی همراه با راهنمایی", items: [{ ...newItem(), title: "راهنمای سایز", body: "اندازه‌های هر لباس را پیش از سفارش بررسی کنید." }, { ...newItem(), title: "تنوع رنگ و مدل", body: "گزینه‌های موجود در صفحه هر محصول نمایش داده می‌شود." }, { ...newItem(), title: "پشتیبانی همراه", body: "برای پرسش درباره انتخاب و سفارش با ما در تماس باشید." }] },
     { ...newBlock("cta"), title: "لباس بعدی‌تان را پیدا کنید", body: "مجموعه پوشاک زنانه بوتیک را ببینید.", buttonLabel: "رفتن به فروشگاه", href: "/shop" },
@@ -52,8 +53,8 @@ const pagePresets: Record<string, { label: string; template: string; blocks: () 
     { ...newBlock("cta"), title: "پاسخ پرسش‌های پرتکرار را ببینید", body: "شاید پاسخ مورد نظرتان در راهنمای خرید آماده باشد.", buttonLabel: "رفتن به پرسش‌های متداول", href: "/faq" },
   ] },
   about: { label: "درباره ما", template: "editorial", blocks: () => [
-    { ...newBlock("hero"), title: "بوتیک مه‌لقا؛ پوشاک زنانه برای استایل شما", body: "لباس‌هایی برای سلیقه‌ها و موقعیت‌های گوناگون، همراه با اطلاعات روشن و راهنمای انتخاب.", buttonLabel: "دیدن مجموعه", href: "/shop", options: { badge: "داستان ما" } },
-    { ...newBlock("text"), title: "باور ما؛ انتخاب باید آسان باشد", body: "در بوتیک مه‌لقا تلاش می‌کنیم رنگ، جنس، سایز و جزئیات هر لباس را روشن معرفی کنیم تا با اطمینان بیشتری انتخاب کنید." },
+    { ...newBlock("hero"), title: "{{siteName}}؛ پوشاک زنانه برای استایل شما", body: "لباس‌هایی برای سلیقه‌ها و موقعیت‌های گوناگون، همراه با اطلاعات روشن و راهنمای انتخاب.", buttonLabel: "دیدن مجموعه", href: "/shop", options: { badge: "داستان ما" } },
+    { ...newBlock("text"), title: "باور ما؛ انتخاب باید آسان باشد", body: "در {{siteName}} تلاش می‌کنیم رنگ، جنس، سایز و جزئیات هر لباس را روشن معرفی کنیم تا با اطمینان بیشتری انتخاب کنید." },
     { ...newBlock("features"), title: "چه چیزی ما را همراه شما می‌کند؟", items: [{ ...newItem(), title: "راهنمای انتخاب", body: "مشخصات و راهنمای سایز را پیش از خرید بررسی کنید." }, { ...newItem(), title: "مجموعه‌های منتخب", body: "لباس‌های کاربردی برای روزمره و مناسبت‌های خاص." }, { ...newItem(), title: "پشتیبانی پاسخ‌گو", body: "در مراحل انتخاب، سفارش و پیگیری در کنار شما هستیم." }] },
     { ...newBlock("cta"), title: "لباس دلخواه خود را پیدا کنید", body: "مجموعه پوشاک فروشگاه را ببینید.", buttonLabel: "ورود به فروشگاه", href: "/shop" },
   ] },
@@ -67,9 +68,10 @@ const pagePresets: Record<string, { label: string; template: string; blocks: () 
   ] },
 };
 
-export function SiteContentManager({ initialPages, initialLinks, initialForms }: { initialPages: Page[]; initialLinks: FooterLink[]; initialForms: FormOption[] }) {
+export function SiteContentManager({ initialPages, initialLinks, initialForms, siteName }: { initialPages: Page[]; initialLinks: FooterLink[]; initialForms: FormOption[]; siteName: string }) {
   const router = useRouter();
-  const [pages, setPages] = useState(initialPages);
+  const branded = <T,>(value: T): T => JSON.parse(JSON.stringify(value, (_key, item) => typeof item === "string" ? siteBrandText(item, siteName) : item));
+  const [pages, setPages] = useState(() => branded(initialPages));
   const [draft, setDraft] = useState<Omit<Page, "id"> & { id?: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [links, setLinks] = useState(initialLinks);
@@ -86,23 +88,23 @@ export function SiteContentManager({ initialPages, initialLinks, initialForms }:
     ...pages,
     ...(["about", "contact", "terms"] as const).filter((slug) => !pages.some((page) => page.slug === slug)).map((slug) => ({
       id: -(["about", "contact", "terms"].indexOf(slug) + 1),
-      title: pagePresets[slug].label,
+      title: siteBrandText(pagePresets[slug].label, siteName),
       slug,
       template: pagePresets[slug].template,
       summary: null,
       blocks: [],
-      metaTitle: pagePresets[slug].label,
+      metaTitle: siteBrandText(pagePresets[slug].label, siteName),
       metaDescription: null,
       status: "demo",
     })),
   ].sort((a, b) => (["about", "contact", "terms"].indexOf(a.slug) - ["about", "contact", "terms"].indexOf(b.slug)) || a.title.localeCompare(b.title, "fa"));
 
-  const edit = (page: Page) => { setSelectedPreset(page.slug in pagePresets ? page.slug : page.slug === "contact" ? "contact" : "story"); setDraft({ ...page, blocks: page.blocks ?? [] }); };
+  const edit = (page: Page) => { setSelectedPreset(page.slug in pagePresets ? page.slug : page.slug === "contact" ? "contact" : "story"); setDraft(branded({ ...page, blocks: page.blocks ?? [] })); };
   const createPresetPage = (key: "about" | "contact" | "terms") => {
     const preset = pagePresets[key];
     const title = key === "about" ? "درباره ما" : key === "contact" ? "تماس با ما" : "شرایط استفاده";
     setSelectedPreset(key);
-    setDraft({ title, slug: key, template: preset.template, summary: "", blocks: preset.blocks(), metaTitle: title, metaDescription: "اطلاعات و راهنمای " + title, status: "published" });
+    setDraft({ title, slug: key, template: preset.template, summary: "", blocks: branded(preset.blocks()), metaTitle: title, metaDescription: "اطلاعات و راهنمای " + title, status: "published" });
   };
   const createFromHomeDesign = () => setDraft({
     title: "صفحه تازه",
@@ -119,7 +121,7 @@ export function SiteContentManager({ initialPages, initialLinks, initialForms }:
     if (!draft) return;
     if (draft.blocks.length && !window.confirm("بلوک‌های فعلی پیش‌نویس با الگوی انتخاب‌شده جایگزین شوند؟ تا وقتی ذخیره نکنید، صفحهٔ منتشرشده تغییر نمی‌کند.")) return;
     const preset = pagePresets[selectedPreset];
-    patchPage("template", preset.template); patchPage("blocks", preset.blocks());
+    patchPage("template", preset.template); patchPage("blocks", branded(preset.blocks()));
   };
   const openHistory = async () => {
     if (!draft?.id) return;
@@ -188,7 +190,7 @@ export function SiteContentManager({ initialPages, initialLinks, initialForms }:
 
     {draft && <section className="space-y-5 rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-black">{draft.id ? "ویرایش صفحه" : "ساخت صفحه جدید"}</h2><p className="text-xs text-slate-500">چیدمان، محتوا و نسخه‌های صفحه را از همین‌جا مدیریت کنید.</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={() => setPreviewOpen(true)} className="btn-ghost"><Eye className="size-4"/>پیش‌نمایش زنده</button>{draft.id && <button type="button" onClick={() => void openHistory()} className="btn-ghost"><History className="size-4"/>نسخه‌های قبلی</button>}</div></div>
-      <div className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 sm:flex-row sm:items-end"><label className="flex-1 text-sm font-bold">الگوی آماده صفحه<select className="input mt-1" value={selectedPreset} onChange={(e) => setSelectedPreset(e.target.value)}>{Object.entries(pagePresets).map(([key, preset]) => <option key={key} value={key}>{preset.label}</option>)}</select></label><button type="button" className="btn-ghost" onClick={applyPreset}><LayoutTemplate className="size-4"/>استفاده از الگو</button><p className="text-xs leading-6 text-amber-900 sm:max-w-xs">الگوها فقط پیش‌نویس فعلی را تغییر می‌دهند؛ انتشار پس از ذخیره و انتخاب وضعیت انجام می‌شود.</p></div>
+      <div className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 sm:flex-row sm:items-end"><label className="flex-1 text-sm font-bold">الگوی آماده صفحه<select className="input mt-1" value={selectedPreset} onChange={(e) => setSelectedPreset(e.target.value)}>{Object.entries(pagePresets).map(([key, preset]) => <option key={key} value={key}>{siteBrandText(preset.label, siteName)}</option>)}</select></label><button type="button" className="btn-ghost" onClick={applyPreset}><LayoutTemplate className="size-4"/>استفاده از الگو</button><p className="text-xs leading-6 text-amber-900 sm:max-w-xs">الگوها فقط پیش‌نویس فعلی را تغییر می‌دهند؛ انتشار پس از ذخیره و انتخاب وضعیت انجام می‌شود.</p></div>
       <div className="grid gap-3 md:grid-cols-2">
         <label className="text-sm">عنوان صفحه<input className="input mt-1" value={draft.title} onChange={(e) => patchPage("title", e.target.value)} /></label>
         <label className="text-sm">نشانی (Slug)<input className="input mt-1" dir="ltr" placeholder="مثلاً shipping-guide" value={draft.slug} onChange={(e) => patchPage("slug", e.target.value)} /></label>

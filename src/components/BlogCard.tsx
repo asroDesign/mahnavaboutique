@@ -7,7 +7,7 @@ import { siteBrandText } from "@/lib/brand";
 
 export type BlogCardPost = { id: number; title: string; slug: string; canonicalUrl?: string | null; excerpt: string | null; content: string; coverImageId: number | null; category: string; publishedAt: Date | string | null; contentType?: string; author?: string | null; authorAvatar?: number | null };
 
-export function BlogCard({ post, featured = false, siteName = "بوتیک مه‌لقا" }: { post: BlogCardPost; featured?: boolean; siteName?: string }) {
+export function BlogCard({ post, featured = false, siteName }: { post: BlogCardPost; featured?: boolean; siteName: string }) {
   const title = siteBrandText(post.title, siteName), excerpt = siteBrandText(post.excerpt, siteName), content = siteBrandText(post.content, siteName), category = siteBrandText(post.category, siteName);
   const minutes = Math.max(1, Math.ceil(stripHtml(content, 100000).split(/\s+/).length / 220));
   const href = post.canonicalUrl || `/blog/${post.slug}`;

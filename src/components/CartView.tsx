@@ -12,6 +12,7 @@ import { CustomerIdentityForm, type CustomerIdentity } from "./CustomerIdentityF
 import { trackAnalyticsEvent } from "@/lib/analytics-client";
 import ProvinceCitySelect from "./ProvinceCitySelect";
 import { provinceOfCity } from "@/lib/iran";
+import { siteBrandText } from "@/lib/brand";
 
 const t = (n: number) => toman(n);
 const keyOf = (i: { productId: number; offerId: number | null; variantId: number | null; selectedOptions?: Record<string, string | string[]> }) => `${i.productId}:${i.offerId ?? 0}:${i.variantId ?? 0}:${JSON.stringify(i.selectedOptions ?? {})}`;
@@ -22,7 +23,7 @@ type PickupCenter = { id:number; name:string; slug:string; province:string|null;
 const tehranDate = (offset:number) => { const now=new Date(); const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tehran",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(now); const date=new Date(`${parts.find(x=>x.type==="year")!.value}-${parts.find(x=>x.type==="month")!.value}-${parts.find(x=>x.type==="day")!.value}T12:00:00Z`);date.setUTCDate(date.getUTCDate()+offset);return date.toISOString().slice(0,10) };
 const pickupDatesFor=(center:PickupCenter|null)=>Array.from({length:14},(_,index)=>tehranDate(index+1)).filter(date=>{const day=new Date(`${date}T12:00:00Z`).getUTCDay();return center?.openingHours.some(hour=>hour.day===day&&!hour.closed)});
 const firstPickupTime=(center:PickupCenter|null,date:string)=>{if(!center)return "";const day=new Date(`${date}T12:00:00Z`).getUTCDay(),hours=center.openingHours.find(hour=>hour.day===day&&!hour.closed);if(!hours)return "";return Array.from({length:48},(_,index)=>`${String(Math.floor(index/2)).padStart(2,"0")}:${index%2?"30":"00"}`).find(time=>time>=hours.open&&time<hours.close)??""};
-export function CartView({ loggedIn, userId = null, defaultName, defaultPhone, savedAddresses=[], paymentGateway="zarinpal", paymentGateways=[], manualPaymentEnabled=true, shippingInfo, initialProfile }: { loggedIn: boolean; userId?: number | null; defaultName: string; defaultPhone: string; savedAddresses?:SavedAddress[]; paymentGateway?: string; paymentGateways?: PaymentGatewayOption[]; manualPaymentEnabled?: boolean; shippingInfo: string; initialProfile?:CustomerIdentity }) {
+export function CartView({ loggedIn, userId = null, defaultName, defaultPhone, savedAddresses=[], paymentGateway="zarinpal", paymentGateways=[], manualPaymentEnabled=true, shippingInfo, siteName, initialProfile }: { loggedIn: boolean; userId?: number | null; defaultName: string; defaultPhone: string; savedAddresses?:SavedAddress[]; paymentGateway?: string; paymentGateways?: PaymentGatewayOption[]; manualPaymentEnabled?: boolean; shippingInfo: string; siteName: string; initialProfile?:CustomerIdentity }) {
   const cart = useCart();
   const router = useRouter();
   const recoveryKey = useRef(uid());
@@ -162,7 +163,7 @@ export function CartView({ loggedIn, userId = null, defaultName, defaultPhone, s
                           <button onClick={() => remove(l.key)} className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600" title="حذف از سبد"><Trash2 className="h-4 w-4" /></button>
                         </div>
                         <div className="flex flex-wrap gap-1.5 text-[11px]">
-                          {l.brand && <span className="rounded bg-emerald-50 px-2 py-0.5 font-bold text-emerald-700">{l.brand}</span>}
+                          {l.brand && <span className="rounded bg-emerald-50 px-2 py-0.5 font-bold text-emerald-700">{siteBrandText(l.brand, siteName)}</span>}
                           {l.partNumber && <span className="rounded border border-slate-200 px-2 py-0.5 font-mono text-slate-600" dir="ltr">PN: {l.partNumber}</span>}
                           {l.sku && <span className="rounded border border-slate-200 px-2 py-0.5 font-mono text-slate-500" dir="ltr">SKU: {l.sku}</span>}
                         </div>

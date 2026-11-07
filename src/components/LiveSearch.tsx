@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, X, Clock, FolderOpen, Tag, ArrowLeft, TrendingUp } from "lucide-react";
+import { siteBrandText } from "@/lib/brand";
 
 type P = { id: number; slug: string; name: string; brand: string; imageId: number | null; price: number; compareAt: number; inStock: boolean; category: string | null; discountPct: number };
 type R = { total: number; products: P[]; categories: { id: number; name: string }[]; brands: string[] };
@@ -15,7 +16,7 @@ function Highlight({ text, q }: { text: string; q: string }) {
   return <>{text.slice(0, i)}<mark className="rounded bg-lime-200 px-0.5 text-emerald-950">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>;
 }
 
-export function LiveSearch({ popular = [], compact }: { popular?: string[]; compact?: boolean }) {
+export function LiveSearch({ popular = [], compact, siteName }: { popular?: string[]; compact?: boolean; siteName: string }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
@@ -89,7 +90,7 @@ export function LiveSearch({ popular = [], compact }: { popular?: string[]; comp
                   <li key={p.id}>
                     <Link href={`/products/${p.slug}`} onClick={() => { remember(term); setOpen(false); }} onMouseEnter={() => setActive(i)} className={`flex items-center gap-3 rounded-2xl p-2 transition ${active === i ? "bg-emerald-50" : ""}`}>
                       <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-[#f3efe2]">{p.imageId ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={`/api/media/${p.imageId}?variant=card`} alt="" className="h-full w-full object-cover"  loading="lazy" decoding="async"/> : <span className="grid h-full place-items-center">🌿</span>}</span>
-                      <span className="min-w-0 flex-1"><b className="line-clamp-1 text-sm text-emerald-950"><Highlight text={p.name} q={term} /></b><span className="text-[11px] text-slate-500">{p.brand}{p.category ? ` · ${p.category}` : ""}</span></span>
+                      <span className="min-w-0 flex-1"><b className="line-clamp-1 text-sm text-emerald-950"><Highlight text={p.name} q={term} /></b><span className="text-[11px] text-slate-500">{siteBrandText(p.brand, siteName)}{p.category ? ` · ${p.category}` : ""}</span></span>
                       <span className="text-left">{p.inStock ? <><b className="block text-sm">{fa(p.price)} <span className="text-[10px] font-normal">ت</span></b>{p.discountPct > 0 && <span className="rounded bg-rose-500 px-1 text-[10px] text-white">{fa(p.discountPct)}٪</span>}</> : <span className="text-[11px] text-rose-500">ناموجود</span>}</span>
                     </Link>
                   </li>

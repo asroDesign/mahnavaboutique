@@ -46,7 +46,7 @@ function supportsIosInstall() {
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
 
-export function PwaInstallButton() {
+export function PwaInstallButton({ siteName }: { siteName: string }) {
   const [prompt, setPrompt] = useState<InstallPrompt | null>(null);
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -117,7 +117,7 @@ export function PwaInstallButton() {
         <aside className="pwa-install-toast" role="status" aria-live="polite" dir="rtl">
           <span className="pwa-install-toast-icon"><Sparkles size={19} aria-hidden="true" /></span>
           <div className="pwa-install-toast-copy">
-            <b>بوتیک مه‌لقا، همیشه همراهت</b>
+            <b>{siteName}، همیشه همراهت</b>
             <span>برای دسترسی سریع‌تر، فروشگاه را به صفحهٔ اصلی اضافه کن.</span>
           </div>
           <button type="button" className="pwa-install-toast-action" onClick={install}>
@@ -137,7 +137,7 @@ export function PwaInstallButton() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-800"><Share className="h-6 w-6" /></div>
-            <h2 id="pwa-install-title" className="text-lg font-black text-slate-900">افزودن مه‌لقا به صفحهٔ اصلی</h2>
+            <h2 id="pwa-install-title" className="text-lg font-black text-slate-900">افزودن {siteName} به صفحهٔ اصلی</h2>
             <p className="mt-2 text-sm leading-7 text-slate-600">در Safari دکمهٔ اشتراک‌گذاری را بزنید و سپس «افزودن به صفحهٔ اصلی» را انتخاب کنید.</p>
             <button type="button" onClick={() => setIosHelp(false)} className="mt-5 w-full rounded-xl bg-rose-800 px-4 py-3 text-sm font-bold text-white">متوجه شدم</button>
           </section>

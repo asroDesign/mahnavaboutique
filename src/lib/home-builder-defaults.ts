@@ -1,12 +1,14 @@
 import type { SitePageBlock, SitePageBlockItem } from "@/db/schema";
 import type { SettingsShape } from "./settings";
 import { identifyBlocks } from "./page-builder";
+import { siteBrandText } from "./brand";
 
 export function homeBuilderDefaults(blocks: SitePageBlock[], st: Pick<SettingsShape, "siteName" | "heroTitle" | "heroSubtitle" | "returnDays" | "currency" | "multiVendor" | "allowSellerSignup">): SitePageBlock[] {
+  blocks = JSON.parse(JSON.stringify(blocks, (_key, value) => typeof value === "string" ? siteBrandText(value, st.siteName) : value)) as SitePageBlock[];
   const text: Record<string, [string, string, string?, string?]> = {
-    hero: [st.heroTitle, st.heroSubtitle, "شروع خرید", "/shop"], trust: ["", ""], categories: ["دسته‌بندی پوشاک زنانه", "مجموعه‌های بوتیک مه‌لقا را ببینید"],
+    hero: [st.heroTitle, st.heroSubtitle, "شروع خرید", "/shop"], trust: ["", ""], categories: ["دسته‌بندی پوشاک زنانه", `مجموعه‌های ${st.siteName} را ببینید`],
     popular: [`محبوب‌ترین‌های ${st.siteName}`, "انتخاب‌های پرطرفدار مشتریان"], fresh: ["تازه‌رسیده‌ها", "جدیدترین لباس‌های بوتیک"], deals: ["پیشنهادهای ویژه", ""],
-    why: ["استایل شخصی شما، انتخاب شماست", "در بوتیک مه‌لقا لباس‌هایی برای روزهای معمولی و لحظه‌های خاص پیدا می‌کنید؛ با مشخصات روشن، راهنمای سایز و امکان انتخاب رنگ و تنوع.", "درباره بوتیک", "/about"],
+    why: ["استایل شخصی شما، انتخاب شماست", `در ${st.siteName} لباس‌هایی برای روزهای معمولی و لحظه‌های خاص پیدا می‌کنید؛ با مشخصات روشن، راهنمای سایز و امکان انتخاب رنگ و تنوع.`, "درباره بوتیک", "/about"],
     guarantee: [`همراه شما در خرید و بازگشت تا ${st.returnDays.toLocaleString("fa-IR")} روز`, "شرایط سفارش و بازگشت را پیش از خرید ببینید؛ پشتیبانی برای پاسخ به پرسش‌های انتخاب و سایز در دسترس شماست.", "راهنمای خرید", "/faq"],
     farms: ["برندها و فروشندگان منتخب", "با مجموعه‌های پوشاک حاضر در بوتیک آشنا شوید"], blog: [`از مجله ${st.siteName}`, "راهنمای سایز، انتخاب رنگ و ساختن استایل شخصی"], testimonials: ["نظر مشتریان", `تجربه خرید از ${st.siteName}`],
   };
@@ -19,6 +21,6 @@ export function homeBuilderDefaults(blocks: SitePageBlock[], st: Pick<SettingsSh
   return identifyBlocks(blocks.map((b) => {
     if (b.type !== "store_section") return b;
     const d = text[b.sectionId || ""];
-    return { ...b, title: b.title || d?.[0] || "", body: b.body || d?.[1] || "", buttonLabel: b.buttonLabel || d?.[2] || "", href: b.href || d?.[3] || "", items: b.items?.length ? b.items : items[b.sectionId || ""] || [], options: b.sectionId === "hero" ? { badge: "پوشاک زنانه بوتیک مه‌لقا", secondaryLabel: "مشاهده همه لباس‌ها", secondaryHref: "/shop", ...b.options } : b.options };
+    return { ...b, title: b.title || d?.[0] || "", body: b.body || d?.[1] || "", buttonLabel: b.buttonLabel || d?.[2] || "", href: b.href || d?.[3] || "", items: b.items?.length ? b.items : items[b.sectionId || ""] || [], options: b.sectionId === "hero" ? { badge: `پوشاک زنانه ${st.siteName}`, secondaryLabel: "مشاهده همه لباس‌ها", secondaryHref: "/shop", ...b.options } : b.options };
   }));
 }

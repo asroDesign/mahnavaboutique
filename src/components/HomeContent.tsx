@@ -20,10 +20,11 @@ const CAT_STYLE = [
 ];
 
 export function HomeContent({ blocks, data }: { blocks: SitePageBlock[]; data: HomeData }) {
+ blocks = JSON.parse(JSON.stringify(blocks, (_key, value) => typeof value === "string" ? siteBrandText(value, data.st.siteName) : value)) as SitePageBlock[];
  const intro = blocks.find(block => block.type === "home_intro");
  const contentBlocks = blocks.filter(block => block.type !== "home_intro");
  const primary = contentBlocks.findIndex(b => b.enabled !== false);
- return <main className="boutique-home mx-auto flex w-full max-w-7xl flex-col gap-16 px-4 pb-16">{intro && <PageBlockFrame block={intro}><HomeIntroSection block={intro} products={data.all} preview/></PageBlockFrame>}<Link href="/clearance" className="group relative flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-[2rem] bg-gradient-to-l from-rose-950 via-rose-900 to-amber-800 px-6 py-5 text-white shadow-lg transition hover:shadow-xl sm:px-8"><span className="absolute -left-5 -top-10 size-36 rounded-full bg-white/10 blur-2xl"/><span className="relative flex items-center gap-4"><span className="grid size-12 place-items-center rounded-2xl bg-white/15 text-2xl">✦</span><span><b className="block text-lg font-black sm:text-xl">حراج آسیب‌دیده و تک‌سایز</b><span className="mt-1 block text-xs text-rose-100 sm:text-sm">تک‌سایزهای محدود و کالاهای دارای ایراد جزئی با قیمت ویژه</span></span></span><span className="relative rounded-xl bg-white px-4 py-2.5 text-sm font-black text-rose-950 transition group-hover:bg-amber-200">مشاهده و خرید ←</span></Link>{contentBlocks.map((block,index) => <PageBlockFrame key={block.id || index} block={block}>{block.type === "store_section" ? <StoreSection block={block} data={data} primary={index === primary}/> : block.type === "product_shelf" ? <ProductShelf block={block} data={data}/> : <SiteBlockContent block={block} primary={index === primary}/>}</PageBlockFrame>)}</main>;
+ return <main className="boutique-home mx-auto flex w-full max-w-7xl flex-col gap-16 px-4 pb-16">{intro && <PageBlockFrame block={intro}><HomeIntroSection block={intro} products={data.all} siteName={data.st.siteName} preview/></PageBlockFrame>}<Link href="/clearance" className="group relative flex flex-wrap items-center justify-between gap-4 overflow-hidden rounded-[2rem] bg-gradient-to-l from-rose-950 via-rose-900 to-amber-800 px-6 py-5 text-white shadow-lg transition hover:shadow-xl sm:px-8"><span className="absolute -left-5 -top-10 size-36 rounded-full bg-white/10 blur-2xl"/><span className="relative flex items-center gap-4"><span className="grid size-12 place-items-center rounded-2xl bg-white/15 text-2xl">✦</span><span><b className="block text-lg font-black sm:text-xl">حراج آسیب‌دیده و تک‌سایز</b><span className="mt-1 block text-xs text-rose-100 sm:text-sm">تک‌سایزهای محدود و کالاهای دارای ایراد جزئی با قیمت ویژه</span></span></span><span className="relative rounded-xl bg-white px-4 py-2.5 text-sm font-black text-rose-950 transition group-hover:bg-amber-200">مشاهده و خرید ←</span></Link>{contentBlocks.map((block,index) => <PageBlockFrame key={block.id || index} block={block}>{block.type === "store_section" ? <StoreSection block={block} data={data} primary={index === primary}/> : block.type === "product_shelf" ? <ProductShelf block={block} data={data}/> : <SiteBlockContent block={block} primary={index === primary}/>}</PageBlockFrame>)}</main>;
 }
 export function StoreSection({ block, data, primary = false }: { block: SitePageBlock; data: HomeData; primary?: boolean }) {
  if (["hero", "trust", "categories", "why", "guarantee", "promo"].includes(block.sectionId || "") || (block.sectionId === "testimonials" && !block.items?.length)) return <BoutiqueSection block={block} data={data} primary={primary}/>;
@@ -60,7 +61,7 @@ case "hero": return (<section  className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-l from-emerald-950/95 via-emerald-900/75 to-emerald-900/10" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 lg:grid-cols-[1.25fr_1fr] lg:py-24">
           <div className="space-y-6 text-white">
-            <span className="inline-flex items-center gap-2 rounded-full bg-lime-300/20 px-4 py-1.5 text-xs font-bold text-lime-200 ring-1 ring-lime-300/30 backdrop-blur"><Shirt className="h-4 w-4" />{block.options?.badge || "پوشاک زنانه بوتیک مه‌لقا"}</span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-lime-300/20 px-4 py-1.5 text-xs font-bold text-lime-200 ring-1 ring-lime-300/30 backdrop-blur"><Shirt className="h-4 w-4" />{block.options?.badge || `پوشاک زنانه ${st.siteName}`}</span>
             <HeroTitle className="text-balance bg-gradient-to-l from-white via-lime-100 to-yellow-100 bg-clip-text text-4xl font-black leading-[1.35] text-transparent md:text-6xl">{homeHero?.title || st.heroTitle}</HeroTitle>
             <p className="max-w-xl text-lg leading-9 text-emerald-50/90">{homeHero?.body || st.heroSubtitle}</p>
             <div className="flex flex-wrap gap-3">
@@ -83,7 +84,7 @@ case "trust": return (<section  className="-mt-4 grid grid-cols-2 gap-3 md:grid-
           })}
         </section>);
 case "categories": return (<section >
-          <Title title={sectionBlock("categories")?.title || "دسته‌بندی پوشاک زنانه"} sub={sectionBlock("categories")?.body || "مجموعه‌های بوتیک مه‌لقا را ببینید"} href="/categories" />
+          <Title title={sectionBlock("categories")?.title || "دسته‌بندی پوشاک زنانه"} sub={sectionBlock("categories")?.body || `مجموعه‌های ${st.siteName} را ببینید`} href="/categories" />
           <div className="grid grid-cols-3 gap-4 sm:grid-cols-6">
             {roots.length ? roots.slice(0, block.options?.limit ?? roots.length).map((c, i) => {
               const [emoji, bg] = CAT_STYLE[i % CAT_STYLE.length];
@@ -103,7 +104,7 @@ case "festival": return (fest && festItems.length > 0 && (
               <div className="flex items-center gap-4"><span className="grid h-16 w-16 place-items-center rounded-3xl bg-white/15 backdrop-blur"><Flame className="h-9 w-9" /></span><div><h2 className="text-2xl font-black md:text-3xl">{sectionBlock("festival")?.title || fest.title}</h2><p className="text-sm text-white/85">{sectionBlock("festival")?.body || `${fest.description} · تا ${faNum(fest.discountPercent)}٪ تخفیف`}</p></div></div>
               <div className="flex items-center gap-3"><span className="text-sm text-white/80">پایان جشنواره:</span><Countdown to={fest.endsAt} light /></div>
             </div>
-            <div className="relative grid grid-cols-2 gap-4 md:grid-cols-4">{festItems.map((p) => <div key={p.id} className="text-slate-900"><ProductCard p={p} /></div>)}</div>
+            <div className="relative grid grid-cols-2 gap-4 md:grid-cols-4">{festItems.map((p) => <div key={p.id} className="text-slate-900"><ProductCard p={p} siteName={st.siteName} /></div>)}</div>
             <Link href="/shop?fest=1" className="relative mt-6 inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-sm font-black text-emerald-900">همه محصولات جشنواره<ArrowLeft className="h-4 w-4" /></Link>
           </section>
         ));
@@ -117,13 +118,13 @@ case "deals": return (deals.length > 0 && (
                 <Countdown to={endOfDay} />
                 <Link href="/shop?sort=discount" className="rounded-2xl bg-amber-950 px-5 py-2 text-sm font-bold text-amber-100">مشاهده همه</Link>
               </div>
-              <div className="flex snap-x gap-3 overflow-x-auto pb-2">{deals.map((p) => <div key={p.id} className="w-52 shrink-0 snap-start"><ProductCard p={p} /></div>)}</div>
+              <div className="flex snap-x gap-3 overflow-x-auto pb-2">{deals.map((p) => <div key={p.id} className="w-52 shrink-0 snap-start"><ProductCard p={p} siteName={st.siteName} /></div>)}</div>
             </div>
           </section>
         ));
 case "popular": return (<section >
           <Title title={sectionBlock("popular")?.title || `محبوب‌ترین‌های ${st.siteName}`} sub={sectionBlock("popular")?.body || "انتخاب مشتریان در هفته گذشته"} href="/shop?sort=best" />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{best.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{best.map((p) => <ProductCard key={p.id} p={p} siteName={st.siteName} />)}</div>
         </section>);
 case "why": return (<section  className="grid items-center gap-8 overflow-hidden rounded-[2.5rem] bg-emerald-950 p-8 text-white md:grid-cols-2 md:p-12">
           <div className="space-y-4">
@@ -159,7 +160,7 @@ case "farms": return (mv && farms.length > 0 && (
         ));
 case "fresh": return (<section >
           <Title title={sectionBlock("fresh")?.title || "تازه‌رسیده‌ها"} sub={sectionBlock("fresh")?.body || "جدیدترین لباس‌های بوتیک"} href="/shop?sort=new" />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{fresh.map((p) => <ProductCard key={p.id} p={p} />)}</div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">{fresh.map((p) => <ProductCard key={p.id} p={p} siteName={st.siteName} />)}</div>
         </section>);
 case "blog": return (latestPosts.length > 0 && <section >
           <Title title={sectionBlock("blog")?.title || `از مجله ${st.siteName}`} sub={sectionBlock("blog")?.body || "راهنمای انتخاب لباس و استایل شخصی"} href="/blog" />

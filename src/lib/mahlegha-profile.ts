@@ -1,6 +1,6 @@
 /** Public facts found for the shop. Individual products and prices were not publicly retrievable. */
 export const MAHLEGHA_PROFILE = {
-  name: "بوتیک مه لقا",
+  name: "{{siteName}}",
   tagline: "فروشگاه آنلاین لباس ترک",
   instagram: "https://www.instagram.com/mahlegha.boutique.ir/",
   address: "اردبیل، نمین، محله سرهنگ، خیابان مرحوم محمدیان، کوچه کشاورز ۲، پلاک ۱۰، طبقه اول",

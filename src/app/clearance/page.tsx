@@ -7,11 +7,17 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Img } from "@/components/ui";
 import { faNum, toman } from "@/lib/util";
+import { getSettings } from "@/lib/settings";
+import { seoMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "حراج آسیب‌دیده و تک‌سایز | بوتیک مه‌لقا",
-  description: "خرید کالاهای آسیب‌دیده جزئی و تک‌سایزهای نمایشگاهی با قیمت ویژه از بوتیک مه‌لقا.",
-};
+export async function generateMetadata() {
+  const settings = await getSettings();
+  return seoMetadata(settings, {
+    title: `حراج آسیب‌دیده و تک‌سایز | ${settings.siteName}`,
+    description: `خرید کالاهای آسیب‌دیده جزئی و تک‌سایزهای نمایشگاهی با قیمت ویژه از ${settings.siteName}.`,
+    path: "/clearance",
+  });
+}
 
 export default async function ClearanceStorePage() {
   const rows = await db.select({ item: clearanceItems, product: products, variant: productVariants })

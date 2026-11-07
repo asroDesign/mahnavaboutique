@@ -38,7 +38,7 @@ export function createHomeTemplateBlocks(layout: SitePageBlock[]): SitePageBlock
     const title = block.title || HOME_SECTION_LABELS[block.sectionId ?? ""] || "بخش فروشگاه";
     const body = block.body || "این بخش را متناسب با محتوای صفحه ویرایش کنید.";
     switch (block.sectionId) {
-      case "hero": return [{ type: "hero", title: block.title || "پوشاک زنانه بوتیک مه‌لقا", body: block.body || "لباس‌های روزمره و انتخاب‌هایی برای لحظه‌های خاص را کشف کنید.", mediaId: block.mediaId ?? null }];
+      case "hero": return [{ type: "hero", title: block.title || "پوشاک زنانه برای استایل شما", body: block.body || "لباس‌های روزمره و انتخاب‌هایی برای لحظه‌های خاص را کشف کنید.", mediaId: block.mediaId ?? null }];
       case "trust": return [features(block.title || "خرید آسان از بوتیک", block.body || "اطلاعات محصول، راهنمای سایز و پشتیبانی در کنار شماست.", block.items)];
       case "categories": return [grid(block.title || "دسته‌بندی پوشاک زنانه", block.body || "مجموعه دلخواه خود را آسان‌تر پیدا کنید.", block.items)];
       case "festival": return [{ type: "cta", title, body: block.body || "پیشنهادهای ویژه و تخفیف‌های جاری را ببینید.", buttonLabel: "مشاهده جشنواره", href: "/shop?fest=1" }];
